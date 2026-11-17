@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="GateTap icon">
+  <defs>
+    <linearGradient id="bg" x1="10" y1="8" x2="87" y2="89" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#145847"/>
+      <stop offset="1" stop-color="#082A23"/>
+    </linearGradient>
+    <linearGradient id="mint" x1="28" y1="28" x2="68" y2="68" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B5FFD9"/>
+      <stop offset="1" stop-color="#57D89A"/>
+    </linearGradient>
+  </defs>
+  <rect x="5" y="5" width="86" height="86" rx="24" fill="url(#bg)"/>
+  <rect x="5.75" y="5.75" width="84.5" height="84.5" rx="23.25" stroke="#A9F4D0" stroke-opacity=".42" stroke-width="1.5"/>
+  <path d="M27 66V42.5C27 39.462 29.462 37 32.5 37H63.5C66.538 37 69 39.462 69 42.5V66" stroke="url(#mint)" stroke-width="6" stroke-linecap="round"/>
+  <path d="M34 66H62" stroke="#FFE38A" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="48" cy="51" r="5.5" fill="#B5FFD9"/>
+  <path d="M48 25V19M61.5 30.5L65.7 26.3M34.5 30.5L30.3 26.3" stroke="#FFE38A" stroke-width="3.4" stroke-linecap="round"/>
+</svg>
