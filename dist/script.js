@@ -187,6 +187,8 @@
     loginView.hidden = true;
     dashboardView.hidden = false;
     document.body.classList.add("app-active");
+    dashboardView.classList.remove("sidebar-open");
+    document.querySelector(".dashboard-menu")?.setAttribute("aria-expanded", "false");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -226,15 +228,30 @@
     event.currentTarget.textContent = showing ? "◌" : "●";
   });
 
-  document.querySelector(".dashboard-menu")?.addEventListener("click", () => {
-    dashboardView.classList.toggle("sidebar-open");
+  const dashboardMenu = document.querySelector(".dashboard-menu");
+  dashboardMenu?.addEventListener("click", () => {
+    const open = dashboardView.classList.toggle("sidebar-open");
+    dashboardMenu.setAttribute("aria-expanded", String(open));
   });
 
   document.querySelectorAll(".dashboard-nav button").forEach((button) => {
     button.addEventListener("click", () => {
-      document.querySelectorAll(".dashboard-nav button").forEach((item) => item.classList.remove("active"));
+      const target = document.getElementById(button.dataset.dashboardTarget);
+      document.querySelectorAll(".dashboard-nav button").forEach((item) => {
+        item.classList.remove("active");
+        item.removeAttribute("aria-current");
+      });
       button.classList.add("active");
+      button.setAttribute("aria-current", "page");
       dashboardView.classList.remove("sidebar-open");
+      dashboardMenu?.setAttribute("aria-expanded", "false");
+      if (target) {
+        target.classList.remove("is-highlighted");
+        target.focus({ preventScroll: true });
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        window.setTimeout(() => target.classList.add("is-highlighted"), 150);
+        window.setTimeout(() => target.classList.remove("is-highlighted"), 1450);
+      }
     });
   });
 
