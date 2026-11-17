@@ -167,12 +167,16 @@
   const userForm = document.getElementById("user-form");
   const userTable = document.getElementById("user-table-body");
   const userCount = document.getElementById("user-count");
+  const userPhotoInput = document.getElementById("managed-photo");
+  const photoUploadPreview = document.getElementById("photo-upload-preview");
+  const profilePhotoPreview = document.getElementById("profile-photo-preview");
   const cardForm = document.getElementById("card-form");
   const cardTable = document.getElementById("card-table-body");
   const settingsForm = document.getElementById("settings-form");
   const doorList = document.getElementById("door-list");
   let dashboardEvents = 0;
   let deniedEvents = 0;
+  let selectedProfilePhoto = "";
 
   function showDashboard() {
     loginView.hidden = true;
@@ -266,6 +270,37 @@
     return Array.from(userTable?.querySelectorAll("tr") || []);
   }
 
+  function initialsFor(name) {
+    const initials = String(name || "1×1").trim().split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("");
+    return initials ? initials.toUpperCase() : "1×1";
+  }
+
+  function photoBadge(name, source, className, placeholder) {
+    const badge = document.createElement("span");
+    badge.className = className;
+    badge.setAttribute("aria-label", name ? "Photo of " + name : "Profile photo preview");
+    if (source) {
+      const image = document.createElement("img");
+      image.src = source;
+      image.alt = "";
+      badge.append(image);
+    } else {
+      badge.textContent = placeholder || initialsFor(name);
+    }
+    return badge;
+  }
+
+  function setPhotoPreview(name, source) {
+    photoUploadPreview?.replaceChildren(photoBadge(name, source, "photo-preview-content", "1×1"));
+    profilePhotoPreview?.replaceChildren(photoBadge(name, source, "profile-photo-content"));
+  }
+
+  function resetPhotoSelection() {
+    selectedProfilePhoto = "";
+    if (userPhotoInput) userPhotoInput.value = "";
+    setPhotoPreview("Sample Student A", "");
+  }
+
   function updateDashboardStats() {
     const userTotal = currentUserRows().length;
     if (totalUsers) totalUsers.textContent = String(userTotal);
@@ -275,7 +310,7 @@
   }
 
   function updateUserSelectors() {
-    const users = currentUserRows().map((row) => row.cells[0]?.textContent).filter(Boolean);
+    const users = currentUserRows().map((row) => row.dataset.userName || row.cells[1]?.textContent).filter(Boolean);
     const cardUser = document.getElementById("card-user");
     const reportUser = document.getElementById("report-user");
     const previousCard = cardUser?.value || "";
@@ -356,9 +391,15 @@
     showTerminal("ACCESS DENIED", "Unknown sample card · " + time, true);
   });
 
-  function createUserRow(name, role, courseYear, rfid, userId) {
+  function createUserRow(name, role, courseYear, rfid, userId, photoSource) {
     const row = document.createElement("tr");
     row.dataset.userId = userId;
+    row.dataset.userName = name;
+    row.dataset.photo = photoSource || "";
+    const photoCell = document.createElement("td");
+    photoCell.className = "user-photo-cell";
+    photoCell.append(photoBadge(name, photoSource, "user-list-photo"));
+    row.append(photoCell);
     createCell(row, name);
     createCell(row, role);
     createCell(row, courseYear || "BSCpE - 4B");
@@ -377,6 +418,26 @@
     return row;
   }
 
+  userPhotoInput?.addEventListener("change", () => {
+    const file = userPhotoInput.files?.[0];
+    if (!file) {
+      selectedProfilePhoto = "";
+      setPhotoPreview(document.getElementById("managed-name")?.value || "Sample Student A", "");
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      userPhotoInput.value = "";
+      document.getElementById("user-form-status").textContent = "Please choose an image file for the profile photo.";
+      return;
+    }
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      selectedProfilePhoto = String(reader.result || "");
+      setPhotoPreview(document.getElementById("managed-name")?.value || "New user", selectedProfilePhoto);
+    });
+    reader.readAsDataURL(file);
+  });
+
   userForm?.addEventListener("submit", (event) => {
     event.preventDefault();
     const idField = document.getElementById("managed-user-id");
@@ -388,16 +449,20 @@
     if (!name || !rfid) return;
     const existing = idField.value ? userTable.querySelector('[data-user-id="' + idField.value + '"]') : null;
     if (existing) {
-      existing.cells[0].textContent = name;
-      existing.cells[1].textContent = role;
-      existing.cells[2].textContent = courseYear;
-      existing.cells[3].textContent = rfid;
+      existing.dataset.userName = name;
+      existing.dataset.photo = selectedProfilePhoto;
+      existing.cells[0].replaceChildren(photoBadge(name, selectedProfilePhoto, "user-list-photo"));
+      existing.cells[1].textContent = name;
+      existing.cells[2].textContent = role;
+      existing.cells[3].textContent = courseYear;
+      existing.cells[4].textContent = rfid;
       notice.textContent = "Local sample profile updated.";
     } else {
-      userTable.append(createUserRow(name, role, courseYear, rfid, "user-" + Date.now()));
+      userTable.append(createUserRow(name, role, courseYear, rfid, "user-" + Date.now(), selectedProfilePhoto));
       notice.textContent = "Local sample profile added.";
     }
     userForm.reset();
+    resetPhotoSelection();
     document.getElementById("managed-course").value = "BSCpE - 4B";
     idField.value = "";
     document.getElementById("user-submit").textContent = "Add user";
@@ -407,6 +472,7 @@
 
   document.getElementById("user-reset")?.addEventListener("click", () => {
     userForm?.reset();
+    resetPhotoSelection();
     document.getElementById("managed-user-id").value = "";
     document.getElementById("managed-course").value = "BSCpE - 4B";
     document.getElementById("user-submit").textContent = "Add user";
@@ -419,10 +485,12 @@
     const row = button.closest("tr");
     if (button.dataset.userAction === "edit") {
       document.getElementById("managed-user-id").value = row.dataset.userId;
-      document.getElementById("managed-name").value = row.cells[0].textContent;
-      document.getElementById("managed-role").value = row.cells[1].textContent;
-      document.getElementById("managed-course").value = row.cells[2].textContent;
-      document.getElementById("managed-rfid").value = row.cells[3].textContent;
+      document.getElementById("managed-name").value = row.dataset.userName || row.cells[1].textContent;
+      document.getElementById("managed-role").value = row.cells[2].textContent;
+      document.getElementById("managed-course").value = row.cells[3].textContent;
+      document.getElementById("managed-rfid").value = row.cells[4].textContent;
+      selectedProfilePhoto = row.dataset.photo || "";
+      setPhotoPreview(row.dataset.userName || row.cells[1].textContent, selectedProfilePhoto);
       document.getElementById("user-submit").textContent = "Save changes";
       document.getElementById("user-form-status").textContent = "Editing local sample profile.";
       document.getElementById("managed-name").focus();

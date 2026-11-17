@@ -472,6 +472,27 @@ body.app-active .dashboard-user small { color: #5e7c70; }
 body.app-active .signout-button { border-color: #cde6d8; color: #25664c; background: #f8fcf9; }
 body.app-active .dashboard-menu { color: #155b45; }
 .overview-stat-grid .stat-icon svg { display: block; width: 1.22rem; height: 1.22rem; }
+/* User photo picker and refreshed navigation icon system */
+.photo-upload-control { display: flex; align-items: center; gap: .8rem; margin: .15rem 0 .25rem; padding: .7rem; border: 1px dashed #bcded0; border-radius: .65rem; background: #f6fcf8; }
+.photo-upload-preview { display: grid; place-items: center; flex: 0 0 4.35rem; width: 4.35rem; height: 4.35rem; overflow: hidden; border: 2px solid #bde8d0; border-radius: .72rem; color: #278362; background: linear-gradient(135deg, #dff8e9, #edf8f2); box-shadow: 0 8px 15px rgb(22 132 87 / .1); }
+.photo-upload-preview > span, .photo-preview-content, .profile-photo-content, .user-list-photo { display: grid; place-items: center; width: 100%; height: 100%; overflow: hidden; color: inherit; font-size: .72rem; font-weight: 800; letter-spacing: .04em; }
+.photo-upload-preview img, .profile-photo img, .user-list-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.photo-upload-control > div:last-child { min-width: 0; flex: 1; }
+.photo-upload-control input[type="file"] { min-height: 0; margin: .26rem 0 0; padding: .36rem .45rem; border-style: dashed; font-size: .67rem; }
+.photo-upload-control p { margin: .25rem 0 0; color: #69877a; font-size: .59rem; line-height: 1.45; }
+.profile-photo { overflow: hidden; }
+.profile-photo-content { font-size: .9rem; }
+.user-photo-cell { width: 3.05rem; }
+.user-list-photo { width: 2rem; height: 2rem; border: 1px solid #c3e7d5; border-radius: 50%; color: #177452; background: #e5f7ed; font-size: .59rem; }
+body.app-active .dashboard-nav button { gap: .88rem; min-height: 3.15rem; padding: .66rem .78rem; color: #1d4d40; font-size: .9rem; font-weight: 650; }
+body.app-active .dashboard-nav button .nav-icon { width: 2.38rem; height: 2.38rem; border: 0; border-radius: .72rem; color: #276779; background: linear-gradient(145deg, #eaf4f4, #d9f2eb); box-shadow: 0 7px 14px rgb(23 103 81 / .08); }
+body.app-active .dashboard-nav button .nav-icon svg { width: 1.34rem; height: 1.34rem; }
+body.app-active .dashboard-nav button[data-dashboard-target="dashboard-rfid-cards"] .nav-icon { color: #158e7e; background: linear-gradient(145deg, #e4faf4, #c9f3e6); }
+body.app-active .dashboard-nav button[data-dashboard-target="dashboard-reports"] .nav-icon { color: #13977a; background: linear-gradient(145deg, #dcf8eb, #c3f0df); }
+body.app-active .dashboard-nav button.active, body.app-active .dashboard-nav button[aria-current="page"] { border-color: #19ad70; color: #fff; background: linear-gradient(135deg, #27c977, #10a860); box-shadow: 0 10px 18px rgb(15 149 88 / .2); }
+body.app-active .dashboard-nav button.active::before, body.app-active .dashboard-nav button[aria-current="page"]::before { background: #b9ffd9; box-shadow: 0 0 10px rgb(185 255 217 / .7); }
+body.app-active .dashboard-nav button.active .nav-icon, body.app-active .dashboard-nav button[aria-current="page"] .nav-icon { color: #fff; background: rgb(255 255 255 / .18); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .25), 0 5px 11px rgb(0 102 58 / .18); }
+@media (max-width: 610px) { .photo-upload-control { align-items: flex-start; } .photo-upload-preview { flex-basis: 3.8rem; width: 3.8rem; height: 3.8rem; } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
