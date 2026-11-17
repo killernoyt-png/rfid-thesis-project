@@ -173,6 +173,91 @@
     button.addEventListener("click", () => recordEvent(button.dataset.action));
   });
 
+  // GateTap is a front-end demonstration. It does not authenticate or retain credentials.
+  const loginView = document.getElementById("login-view");
+  const dashboardView = document.getElementById("dashboard-view");
+  const loginForm = document.getElementById("login-form");
+  const dashboardScan = document.getElementById("dashboard-scan");
+  const dashboardTerminal = document.getElementById("dashboard-terminal");
+  const dashboardLog = document.getElementById("dashboard-log");
+  const dashboardCount = document.getElementById("dashboard-count");
+  let dashboardEvents = 0;
+
+  function showDashboard() {
+    loginView.hidden = true;
+    dashboardView.hidden = false;
+    document.body.classList.add("app-active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function showLogin() {
+    dashboardView.hidden = true;
+    loginView.hidden = false;
+    document.body.classList.add("app-active");
+    loginForm.reset();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function showPublicSite() {
+    document.body.classList.remove("app-active");
+    dashboardView.hidden = true;
+    loginView.hidden = false;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  loginForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    showDashboard();
+  });
+
+  document.querySelectorAll("[data-open-public]").forEach((button) => {
+    button.addEventListener("click", showPublicSite);
+  });
+
+  document.querySelectorAll("[data-open-portal], [data-signout]").forEach((button) => {
+    button.addEventListener("click", showLogin);
+  });
+
+  document.querySelector(".password-toggle")?.addEventListener("click", (event) => {
+    const password = document.getElementById("portal-password");
+    const showing = password.type === "text";
+    password.type = showing ? "password" : "text";
+    event.currentTarget.setAttribute("aria-label", showing ? "Show password" : "Hide password");
+    event.currentTarget.textContent = showing ? "◌" : "●";
+  });
+
+  document.querySelector(".dashboard-menu")?.addEventListener("click", () => {
+    dashboardView.classList.toggle("sidebar-open");
+  });
+
+  document.querySelectorAll(".dashboard-nav button").forEach((button) => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll(".dashboard-nav button").forEach((item) => item.classList.remove("active"));
+      button.classList.add("active");
+      dashboardView.classList.remove("sidebar-open");
+    });
+  });
+
+  dashboardScan?.addEventListener("click", () => {
+    const now = new Date();
+    const time = formatTime(now);
+    dashboardTerminal.innerHTML =
+      '<span class="terminal-wave">✓</span>' +
+      "<strong>ENTRY RECORDED</strong>" +
+      "<p>Sample Student A · " + time + "</p>";
+    const emptyDashboard = dashboardLog.querySelector(".dash-empty");
+    if (emptyDashboard) emptyDashboard.remove();
+    const sampleRow = document.createElement("tr");
+    sampleRow.innerHTML =
+      "<td>" + time + "</td>" +
+      "<td>Sample Student A</td>" +
+      "<td>Entry</td>" +
+      "<td>Entry Recorded · sample transaction</td>";
+    dashboardLog.prepend(sampleRow);
+    dashboardEvents += 1;
+    dashboardCount.textContent = dashboardEvents + " sample event" + (dashboardEvents === 1 ? "" : "s");
+  });
+
   /*
     TODO: Add real, post-testing values here only after research evaluation.
     Each result object can hold a label and measured values for charts.

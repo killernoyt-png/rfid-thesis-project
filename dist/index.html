@@ -10,7 +10,99 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="app-active">
+  <div id="portal-app">
+    <section class="login-view" id="login-view" aria-labelledby="login-title">
+      <div class="login-visual">
+        <a class="portal-brand" href="#login" aria-label="SKSU GateTap portal">
+          <span class="portal-mark" aria-hidden="true">SK</span>
+          <span><strong>SKSU GateTap</strong><small>RFID Monitoring Portal</small></span>
+        </a>
+        <div class="login-story">
+          <p class="app-kicker"><span></span> College of Engineering · BSCpE</p>
+          <h1>One tap.<br><em>A clearer gate.</em></h1>
+          <p>Access the prototype monitoring dashboard for the RFID-based student entry and exit system.</p>
+          <div class="login-motif" aria-hidden="true">
+            <span class="motif-card">RFID</span><span class="motif-wave wave-one"></span><span class="motif-wave wave-two"></span><span class="motif-reader">⌁</span>
+          </div>
+          <p class="login-campus">Sultan Kudarat State University · Isulan Campus</p>
+        </div>
+      </div>
+      <div class="login-panel">
+        <div class="login-card">
+          <p class="app-kicker green"><span></span> Gate monitoring</p>
+          <h2 id="login-title">Welcome back.</h2>
+          <p class="login-intro">Sign in to view the RFID gate dashboard.</p>
+          <form id="login-form" novalidate>
+            <label for="portal-user">User ID or email</label>
+            <input id="portal-user" name="user" type="text" autocomplete="username" placeholder="Enter your user ID" required>
+            <label for="portal-password">Password</label>
+            <div class="password-field"><input id="portal-password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required><button type="button" class="password-toggle" aria-label="Show password">◌</button></div>
+            <div class="login-options"><label><input type="checkbox"> <span>Keep me signed in on this device</span></label><button class="link-button" type="button">Forgot password?</button></div>
+            <button class="portal-primary" type="submit">Sign in to dashboard <span aria-hidden="true">→</span></button>
+          </form>
+          <p class="prototype-note"><span aria-hidden="true">ⓘ</span> Prototype interface only. Credentials are not sent or stored.</p>
+          <button class="public-site-link" type="button" data-open-public>View the thesis project website <span aria-hidden="true">↗</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-view" id="dashboard-view" aria-label="RFID monitoring dashboard" hidden>
+      <aside class="dashboard-sidebar">
+        <div class="dashboard-logo"><span class="portal-mark" aria-hidden="true">SK</span><span><strong>GateTap</strong><small>SKSU · Isulan</small></span></div>
+        <p class="side-label">Monitoring hub</p>
+        <nav class="dashboard-nav" aria-label="Dashboard sections">
+          <button class="active" type="button"><span aria-hidden="true">⌂</span> Overview</button>
+          <button type="button"><span aria-hidden="true">▣</span> Students</button>
+          <button type="button"><span aria-hidden="true">⌁</span> RFID cards</button>
+          <button type="button"><span aria-hidden="true">◷</span> Gate activity</button>
+          <button type="button"><span aria-hidden="true">▦</span> Reports</button>
+        </nav>
+        <div class="sidebar-footer"><span class="connection-dot"></span><span>Prototype mode<br><small>Local sample data</small></span></div>
+        <button class="sidebar-site-link" type="button" data-open-public><span aria-hidden="true">↗</span> Thesis website</button>
+      </aside>
+      <div class="dashboard-main">
+        <header class="dashboard-header">
+          <button class="dashboard-menu" type="button" aria-label="Toggle dashboard menu">☰</button>
+          <div><p class="app-kicker green"><span></span> RFID gate monitor</p><h2>Good day, <em>Research Team.</em></h2></div>
+          <div class="dashboard-user"><span class="user-dot" aria-hidden="true">GT</span><span><strong>GateTap portal</strong><small>Prototype session</small></span><button type="button" class="signout-button" data-signout>Sign out</button></div>
+        </header>
+        <main class="dashboard-content">
+          <div class="dash-welcome">
+            <div><h3>Gate overview</h3><p>Monitor sample entry and exit events while the hardware prototype is being evaluated.</p></div>
+            <span class="dashboard-status"><i></i> Reader interface ready</span>
+          </div>
+          <section class="stat-grid" aria-label="Prototype status summary">
+            <article><span class="stat-icon green-icon">⌁</span><div><p>Today's scans</p><strong>—</strong><small>Awaiting field testing</small></div></article>
+            <article><span class="stat-icon gold-icon">▣</span><div><p>Student records</p><strong>—</strong><small>Sample data only</small></div></article>
+            <article><span class="stat-icon blue-icon">◉</span><div><p>Gate status</p><strong>Ready</strong><small>Prototype reader state</small></div></article>
+            <article><span class="stat-icon maroon-icon">)))</span><div><p>Voice output</p><strong>Standby</strong><small>Fixed English prompts</small></div></article>
+          </section>
+          <section class="dashboard-grid">
+            <article class="live-terminal">
+              <div class="panel-heading"><div><p class="panel-kicker">Interactive sample</p><h3>Gate terminal</h3></div><span class="live-tag"><i></i> ONLINE</span></div>
+              <div class="terminal-display" id="dashboard-terminal" aria-live="polite"><span class="terminal-wave">⌁</span><strong>READY FOR RFID TAP</strong><p>Use the sample action to preview the gate response.</p></div>
+              <button class="run-sample" type="button" id="dashboard-scan"><span aria-hidden="true">▣</span> Run sample RFID tap</button>
+            </article>
+            <article class="reader-health">
+              <div class="panel-heading"><div><p class="panel-kicker">Hardware checklist</p><h3>Prototype status</h3></div><span class="muted-tag">No live device</span></div>
+              <ul class="health-list">
+                <li><span>RFID reader</span><b>Ready for setup</b></li>
+                <li><span>ESP32 edge device</span><b>Configuration pending</b></li>
+                <li><span>Raspberry Pi Zero W</span><b>Local server setup</b></li>
+                <li><span>HDMI monitor</span><b>Display test pending</b></li>
+              </ul>
+              <p class="hardware-note">Update these statuses once the final components are tested.</p>
+            </article>
+          </section>
+          <section class="activity-panel">
+            <div class="panel-heading"><div><p class="panel-kicker">Sample activity</p><h3>Recent gate events</h3></div><span id="dashboard-count">No sample events</span></div>
+            <div class="dashboard-table-wrap"><table><thead><tr><th>Time</th><th>Card holder</th><th>Event</th><th>Monitor message</th></tr></thead><tbody id="dashboard-log"><tr class="dash-empty"><td colspan="4">No RFID event has been simulated. This dashboard is not connected to student records.</td></tr></tbody></table></div>
+          </section>
+        </main>
+      </div>
+    </section>
+  </div>
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <nav class="nav shell" aria-label="Main navigation">
@@ -29,6 +121,7 @@
         <a href="#demo">Gate demo</a>
         <a href="#results">Results</a>
         <a href="#team">Team</a>
+        <button class="portal-link" type="button" data-open-portal>Gate portal</button>
         <button class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch color theme">
           <span class="sun" aria-hidden="true">☀</span><span class="moon" aria-hidden="true">☾</span>
         </button>
