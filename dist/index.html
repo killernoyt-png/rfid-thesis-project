@@ -49,18 +49,21 @@
 
     <section class="dashboard-view" id="dashboard-view" aria-label="RFID monitoring dashboard" hidden>
       <aside class="dashboard-sidebar" id="dashboard-sidebar">
-        <div class="dashboard-logo"><span class="portal-mark" aria-hidden="true">SK</span><span><strong>GateTap</strong><small>SKSU · Isulan</small></span></div>
-        <p class="side-label">Monitoring hub</p>
+        <div class="dashboard-logo"><span class="sidebar-emblem" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span><strong>Gate<span>Tap</span></strong><small>SKSU entry control</small></span></div>
+        <p class="side-label">Control center</p>
         <nav class="dashboard-nav" aria-label="Dashboard sections">
           <button class="active" type="button" data-dashboard-target="dashboard-overview" aria-controls="dashboard-overview" aria-current="page"><span aria-hidden="true">⌂</span> Overview</button>
-          <button type="button" data-dashboard-target="dashboard-students" aria-controls="dashboard-students"><span aria-hidden="true">▣</span> Students</button>
+          <button type="button" data-dashboard-target="dashboard-users" aria-controls="dashboard-users"><span aria-hidden="true">▣</span> User management</button>
+          <button type="button" data-dashboard-target="dashboard-access-logs" aria-controls="dashboard-access-logs"><span aria-hidden="true">◷</span> Access logs</button>
           <button type="button" data-dashboard-target="dashboard-rfid-cards" aria-controls="dashboard-rfid-cards"><span aria-hidden="true">⌁</span> RFID cards</button>
-          <button type="button" data-dashboard-target="dashboard-activity" aria-controls="dashboard-activity"><span aria-hidden="true">◷</span> Gate activity</button>
           <button type="button" data-dashboard-target="dashboard-reports" aria-controls="dashboard-reports"><span aria-hidden="true">▦</span> Reports</button>
         </nav>
-        <div class="sidebar-footer"><span class="connection-dot"></span><span>Prototype mode<br><small>Local sample data</small></span></div>
-        <button class="sidebar-site-link" type="button" data-open-public><span aria-hidden="true">↗</span> Thesis website</button>
-        <button class="sidebar-back-button" type="button" data-signout><span aria-hidden="true">←</span> Back to login</button>
+        <div class="hardware-status" aria-label="Hardware status">
+          <div class="status-header"><span>Gate Node #01</span><span class="pulse-dot" title="System Online" aria-hidden="true"></span></div>
+          <div class="status-row"><span>RFID Reader</span><span class="status-tag">Connected</span></div>
+          <div class="status-row"><span>Voice &amp; Display</span><span class="status-tag">Ready</span></div>
+        </div>
+        <button class="sidebar-overview-button" type="button" data-dashboard-target="dashboard-overview" aria-controls="dashboard-overview" aria-label="Back to Overview" title="Back to Overview"><span aria-hidden="true">←</span><span class="sidebar-overview-text">Overview</span></button>
       </aside>
       <div class="dashboard-main">
         <header class="dashboard-header">
@@ -70,60 +73,88 @@
         </header>
         <main class="dashboard-content">
           <section class="dashboard-pane active" id="dashboard-overview" tabindex="-1" aria-labelledby="overview-heading">
-          <div class="dash-welcome">
-            <div><h3 id="overview-heading">Gate overview</h3><p>Monitor sample entry and exit events while the hardware prototype is being evaluated.</p></div>
-            <span class="dashboard-status"><i></i> Reader interface ready</span>
-          </div>
-          <section class="stat-grid" aria-label="Prototype status summary">
-            <article><span class="stat-icon green-icon">⌁</span><div><p>Today's scans</p><strong>—</strong><small>Awaiting field testing</small></div></article>
-            <article><span class="stat-icon gold-icon">▣</span><div><p>Student records</p><strong>—</strong><small>Sample data only</small></div></article>
-            <article><span class="stat-icon blue-icon">◉</span><div><p>Gate status</p><strong>Ready</strong><small>Prototype reader state</small></div></article>
-            <article><span class="stat-icon maroon-icon">)))</span><div><p>Voice output</p><strong>Standby</strong><small>Fixed English prompts</small></div></article>
+          <section class="overview-hero" aria-label="Gate status summary">
+            <div class="overview-hero-copy"><p class="overview-eyebrow"><i></i> GateTap command center</p><h3 id="overview-heading">Gate <em>overview</em></h3><p>Monitor entry and exit activity from the SKSU Isulan access point in one focused workspace.</p><div class="overview-meta"><span>SKSU · Isulan Campus</span><span>RFID access monitoring</span></div></div>
+            <div class="reader-status-card"><span class="reader-chip" aria-hidden="true"><i></i><i></i><i></i></span><div><p>RFID gate reader</p><strong>Operational</strong><small><i></i> Ready for the next tap</small></div></div>
+          </section>
+          <section class="stat-grid overview-stat-grid" aria-label="Gate monitoring summary">
+            <article class="overview-stat users-stat"><div class="stat-heading"><span class="stat-icon green-icon">▣</span><p>Total users</p></div><strong id="dashboard-total-users">1</strong><small>Profiles in this local session</small><span class="stat-foot">User directory <b>→</b></span></article>
+            <article class="overview-stat taps-stat"><div class="stat-heading"><span class="stat-icon gold-icon">⌁</span><p>Tap-ins today</p></div><strong id="dashboard-total-taps">0</strong><small>Approved sample entries</small><span class="stat-foot">Today’s activity <b>↗</b></span></article>
+            <article class="overview-stat denied-stat"><div class="stat-heading"><span class="stat-icon maroon-icon">!</span><p>Unauthorized attempts</p></div><strong id="dashboard-unauthorized">0</strong><small>Denied sample entries</small><span class="stat-foot">Security watch <b>!</b></span></article>
+            <article class="overview-stat system-stat"><div class="stat-heading"><span class="stat-icon blue-icon">◉</span><p>Gate status</p></div><strong>Ready</strong><small>Reader interface connected</small><span class="stat-foot"><i></i> System online</span></article>
           </section>
           <section class="dashboard-grid">
             <article class="live-terminal">
-              <div class="panel-heading"><div><p class="panel-kicker">Interactive sample</p><h3>Gate terminal</h3></div><span class="live-tag"><i></i> ONLINE</span></div>
-              <div class="terminal-display" id="dashboard-terminal" aria-live="polite"><span class="terminal-wave">⌁</span><strong>READY FOR RFID TAP</strong><p>Use the sample action to preview the gate response.</p></div>
-              <button class="run-sample" type="button" id="dashboard-scan"><span aria-hidden="true">▣</span> Run sample RFID tap</button>
+              <div class="panel-heading"><div><p class="panel-kicker">Live access console</p><h3>Gate terminal</h3></div><span class="live-tag"><i></i> READY</span></div>
+              <div class="terminal-display" id="dashboard-terminal" aria-live="polite"><span class="terminal-wave">RF</span><strong>READY FOR RFID TAP</strong><p>Use a sample action to preview the gate response.</p></div>
+              <div class="terminal-actions"><button class="run-sample" type="button" id="dashboard-scan"><span aria-hidden="true">✓</span> Simulate approved tap</button><button class="run-sample run-denied" type="button" id="dashboard-denied"><span aria-hidden="true">!</span> Simulate denied tap</button></div>
             </article>
             <article class="overview-brief">
               <div class="panel-heading"><div><p class="panel-kicker">System focus</p><h3>Prototype workflow</h3></div><span class="muted-tag">Sample view</span></div>
               <ol class="overview-flow"><li><b>01</b><span>Student taps a passive RFID card.</span></li><li><b>02</b><span>The reader and ESP32 validate the tag.</span></li><li><b>03</b><span>The monitor and voice prompt confirm the event.</span></li></ol>
-              <p class="hardware-note">Open RFID Cards to view the component checklist.</p>
+              <p class="hardware-note">Use the side menu to manage users, cards, logs, reports, and access settings.</p>
             </article>
           </section>
           </section>
-          <section class="dashboard-pane" id="dashboard-students" tabindex="-1" aria-labelledby="students-heading" hidden>
-          <div class="student-panel">
-            <div class="panel-heading"><div><p class="panel-kicker">Student monitoring</p><h3 id="students-heading">Student records</h3></div><span class="muted-tag">Sample profile</span></div>
-            <div class="student-sample"><span class="sample-avatar" aria-hidden="true">SA</span><div><strong>Sample Student A</strong><p>Sample Course · Passive RFID card linked for demonstration</p></div><span class="sample-state">Ready for test</span></div>
-            <p class="student-note">Real student details will appear only after approved profiles are added to the local database.</p>
-          </div>
+          <section class="dashboard-pane" id="dashboard-users" tabindex="-1" aria-labelledby="users-heading" hidden>
+            <div class="management-layout">
+              <article class="management-card profile-editor-card">
+                <div class="panel-heading"><div><p class="panel-kicker">Accounts</p><h3 id="users-heading">User management</h3></div><span class="muted-tag">Local sample data</span></div>
+                <div class="profile-summary" aria-label="Profile summary">
+                  <div class="profile-photo" aria-hidden="true"><span>SA</span></div>
+                  <div>
+                    <p class="profile-label">Course year</p>
+                    <strong>BSCpE - 4B</strong>
+                  </div>
+                </div>
+                <p class="form-note">Add or edit a Student or Employee, then assign an RFID Card No. This prototype does not save information after refresh.</p>
+                <form class="management-form" id="user-form">
+                  <input id="managed-user-id" type="hidden">
+                  <label for="managed-name">Full name</label><input id="managed-name" type="text" required placeholder="Sample Student B">
+                  <label for="managed-role">Account type</label><select id="managed-role"><option>Student</option><option>Employee</option></select>
+                  <label for="managed-course">Course year</label><input id="managed-course" type="text" value="BSCpE - 4B" required>
+                  <label for="managed-rfid">RFID Card No.</label><input id="managed-rfid" type="text" required placeholder="RFID-0002">
+                  <div class="form-actions"><button class="form-primary" id="user-submit" type="submit">Add user</button><button class="form-secondary" id="user-reset" type="button">Clear</button></div>
+                  <p class="form-status" id="user-form-status" aria-live="polite"></p>
+                </form>
+              </article>
+              <article class="management-card table-card">
+                <div class="panel-heading"><div><p class="panel-kicker">Accounts list</p><h3>Students &amp; employees</h3></div><span id="user-count" class="muted-tag">1 sample user</span></div>
+                <div class="dashboard-table-wrap"><table><thead><tr><th>Name</th><th>Type</th><th>Course year</th><th>RFID Card No.</th><th>Actions</th></tr></thead><tbody id="user-table-body"><tr data-user-id="sample-user"><td>Sample Student A</td><td>Student</td><td>BSCpE - 4B</td><td>SAMPLE-RFID-001</td><td class="table-actions"><button type="button" class="table-action" data-user-action="edit">Edit</button><button type="button" class="table-action danger-action" data-user-action="delete">Delete</button></td></tr></tbody></table></div>
+              </article>
+            </div>
+          </section>
+          <section class="dashboard-pane" id="dashboard-access-logs" tabindex="-1" aria-labelledby="activity-heading" hidden>
+            <div class="activity-panel">
+              <div class="panel-heading"><div><p class="panel-kicker">Entry history</p><h3 id="activity-heading">Access logs / history</h3></div><span id="dashboard-count">No sample events</span></div>
+              <div class="dashboard-table-wrap"><table><thead><tr><th>Time</th><th>Card holder</th><th>Door / room</th><th>Result</th><th>Monitor message</th></tr></thead><tbody id="dashboard-log"><tr class="dash-empty"><td colspan="5">No RFID event has been simulated. This dashboard is not connected to student records.</td></tr></tbody></table></div>
+            </div>
           </section>
           <section class="dashboard-pane" id="dashboard-rfid-cards" tabindex="-1" aria-labelledby="rfid-cards-heading" hidden>
-          <article class="reader-health">
-            <div class="panel-heading"><div><p class="panel-kicker">Hardware checklist</p><h3 id="rfid-cards-heading">RFID card and reader setup</h3></div><span class="muted-tag">No live device</span></div>
-            <ul class="health-list">
-              <li><span>RFID reader</span><b>Ready for setup</b></li>
-              <li><span>Passive RFID cards</span><b>Sample tag only</b></li>
-              <li><span>ESP32 edge device</span><b>Configuration pending</b></li>
-              <li><span>Raspberry Pi Zero W</span><b>Local server setup</b></li>
-              <li><span>HDMI monitor</span><b>Display test pending</b></li>
-            </ul>
-            <p class="hardware-note">Update these statuses once the final components are tested.</p>
-          </article>
-          </section>
-          <section class="dashboard-pane" id="dashboard-activity" tabindex="-1" aria-labelledby="activity-heading" hidden>
-          <div class="activity-panel">
-            <div class="panel-heading"><div><p class="panel-kicker">Sample activity</p><h3 id="activity-heading">Recent gate events</h3></div><span id="dashboard-count">No sample events</span></div>
-            <div class="dashboard-table-wrap"><table><thead><tr><th>Time</th><th>Card holder</th><th>Event</th><th>Monitor message</th></tr></thead><tbody id="dashboard-log"><tr class="dash-empty"><td colspan="4">No RFID event has been simulated. This dashboard is not connected to student records.</td></tr></tbody></table></div>
-          </div>
+            <div class="management-layout">
+              <article class="management-card">
+                <div class="panel-heading"><div><p class="panel-kicker">Card control</p><h3 id="rfid-cards-heading">RFID card management</h3></div><span class="muted-tag">Card actions</span></div>
+                <p class="form-note">Register a new card and assign it to a local sample profile.</p>
+                <form class="management-form" id="card-form">
+                  <label for="card-number">Card number</label><input id="card-number" type="text" required placeholder="RFID-0003">
+                  <label for="card-user">Assigned user</label><select id="card-user"><option value="">Unassigned</option><option value="Sample Student A">Sample Student A</option></select>
+                  <button class="form-primary" type="submit">Register card</button>
+                  <p class="form-status" id="card-form-status" aria-live="polite"></p>
+                </form>
+              </article>
+              <article class="management-card table-card">
+                <div class="panel-heading"><div><p class="panel-kicker">Card directory</p><h3>Registered cards</h3></div><span class="muted-tag">Temporary session</span></div>
+                <div class="dashboard-table-wrap"><table><thead><tr><th>Card number</th><th>Assigned to</th><th>Status</th><th>Actions</th></tr></thead><tbody id="card-table-body"><tr><td>SAMPLE-RFID-001</td><td>Sample Student A</td><td><span class="access-status passed">Active</span></td><td class="table-actions"><button type="button" class="table-action danger-action" data-card-action="block">Block</button></td></tr></tbody></table></div>
+              </article>
+            </div>
           </section>
           <section class="dashboard-pane" id="dashboard-reports" tabindex="-1" aria-labelledby="reports-heading" hidden>
-          <div class="report-panel">
-            <div class="panel-heading"><div><p class="panel-kicker">Research reporting</p><h3 id="reports-heading">Evaluation reports</h3></div><span class="muted-tag">Testing pending</span></div>
-            <div class="report-placeholder"><span aria-hidden="true">↗</span><div><strong>Results will be added after testing.</strong><p>Use this space for approved findings on scanning speed, tag detection accuracy, logging reliability, display and voice output, and user acceptability.</p></div></div>
-          </div>
+            <div class="report-panel">
+              <div class="panel-heading"><div><p class="panel-kicker">Research reporting</p><h3 id="reports-heading">Attendance &amp; access reports</h3></div><span class="muted-tag">Local preview</span></div>
+              <p class="form-note">Create a browser-only preview per day or per user. Use collected and approved records before producing research results.</p>
+              <div class="report-controls"><label for="report-date">Date<input id="report-date" type="date"></label><label for="report-user">User<select id="report-user"><option value="All users">All users</option><option value="Sample Student A">Sample Student A</option></select></label><button class="form-primary" type="button" id="report-preview">Preview report</button><button class="form-secondary" type="button" id="report-print">Print</button><button class="form-secondary" type="button" id="report-download">Download CSV</button></div>
+              <div class="report-placeholder" id="report-preview-area"><span aria-hidden="true">▦</span><div><strong>Report preview is ready when you are.</strong><p id="report-status" aria-live="polite">Choose a date or user, then select Preview report.</p></div></div>
+            </div>
           </section>
         </main>
       </div>

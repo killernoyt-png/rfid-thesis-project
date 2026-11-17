@@ -178,10 +178,22 @@
   const dashboardView = document.getElementById("dashboard-view");
   const loginForm = document.getElementById("login-form");
   const dashboardScan = document.getElementById("dashboard-scan");
+  const dashboardDenied = document.getElementById("dashboard-denied");
   const dashboardTerminal = document.getElementById("dashboard-terminal");
   const dashboardLog = document.getElementById("dashboard-log");
   const dashboardCount = document.getElementById("dashboard-count");
+  const totalUsers = document.getElementById("dashboard-total-users");
+  const totalTaps = document.getElementById("dashboard-total-taps");
+  const unauthorizedAttempts = document.getElementById("dashboard-unauthorized");
+  const userForm = document.getElementById("user-form");
+  const userTable = document.getElementById("user-table-body");
+  const userCount = document.getElementById("user-count");
+  const cardForm = document.getElementById("card-form");
+  const cardTable = document.getElementById("card-table-body");
+  const settingsForm = document.getElementById("settings-form");
+  const doorList = document.getElementById("door-list");
   let dashboardEvents = 0;
+  let deniedEvents = 0;
 
   function showDashboard() {
     loginView.hidden = true;
@@ -190,6 +202,7 @@
     dashboardView.classList.remove("sidebar-open");
     document.querySelector(".dashboard-menu")?.setAttribute("aria-expanded", "false");
     selectDashboardPane("dashboard-overview", false);
+    updateDashboardStats();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -257,31 +270,280 @@
     }
   }
 
-  document.querySelectorAll(".dashboard-nav button").forEach((button) => {
+  document.querySelectorAll("[data-dashboard-target]").forEach((button) => {
     button.addEventListener("click", () => {
       selectDashboardPane(button.dataset.dashboardTarget, true);
     });
   });
 
-  dashboardScan?.addEventListener("click", () => {
+  function createCell(row, value) {
+    const cell = document.createElement("td");
+    cell.textContent = value;
+    row.append(cell);
+    return cell;
+  }
+
+  function currentUserRows() {
+    return Array.from(userTable?.querySelectorAll("tr") || []);
+  }
+
+  function updateDashboardStats() {
+    const userTotal = currentUserRows().length;
+    if (totalUsers) totalUsers.textContent = String(userTotal);
+    if (totalTaps) totalTaps.textContent = String(dashboardEvents);
+    if (unauthorizedAttempts) unauthorizedAttempts.textContent = String(deniedEvents);
+    if (userCount) userCount.textContent = userTotal + " sample " + (userTotal === 1 ? "user" : "users");
+  }
+
+  function updateUserSelectors() {
+    const users = currentUserRows().map((row) => row.cells[0]?.textContent).filter(Boolean);
+    const cardUser = document.getElementById("card-user");
+    const reportUser = document.getElementById("report-user");
+    const previousCard = cardUser?.value || "";
+    const previousReport = reportUser?.value || "All users";
+    if (cardUser) {
+      cardUser.replaceChildren();
+      const unassigned = document.createElement("option");
+      unassigned.value = "";
+      unassigned.textContent = "Unassigned";
+      cardUser.append(unassigned);
+      users.forEach((name) => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        cardUser.append(option);
+      });
+      cardUser.value = users.includes(previousCard) ? previousCard : "";
+    }
+    if (reportUser) {
+      reportUser.replaceChildren();
+      const allUsers = document.createElement("option");
+      allUsers.value = "All users";
+      allUsers.textContent = "All users";
+      reportUser.append(allUsers);
+      users.forEach((name) => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        reportUser.append(option);
+      });
+      reportUser.value = users.includes(previousReport) ? previousReport : "All users";
+    }
+  }
+
+  function addAccessLog({ holder, door, result, message }) {
     const now = new Date();
-    const time = formatTime(now);
-    dashboardTerminal.innerHTML =
-      '<span class="terminal-wave">✓</span>' +
-      "<strong>ENTRY RECORDED</strong>" +
-      "<p>Sample Student A · " + time + "</p>";
-    const emptyDashboard = dashboardLog.querySelector(".dash-empty");
+    const emptyDashboard = dashboardLog?.querySelector(".dash-empty");
     if (emptyDashboard) emptyDashboard.remove();
-    const sampleRow = document.createElement("tr");
-    sampleRow.innerHTML =
-      "<td>" + time + "</td>" +
-      "<td>Sample Student A</td>" +
-      "<td>Entry</td>" +
-      "<td>Entry Recorded · sample transaction</td>";
-    dashboardLog.prepend(sampleRow);
+    const row = document.createElement("tr");
+    createCell(row, formatTime(now));
+    createCell(row, holder);
+    createCell(row, door);
+    const stateCell = document.createElement("td");
+    const state = document.createElement("span");
+    state.className = "access-status " + (result === "PASSED" ? "passed" : "denied");
+    state.textContent = result;
+    stateCell.append(state);
+    row.append(stateCell);
+    createCell(row, message);
+    dashboardLog?.prepend(row);
     dashboardEvents += 1;
-    dashboardCount.textContent = dashboardEvents + " sample event" + (dashboardEvents === 1 ? "" : "s");
+    if (result === "DENIED") deniedEvents += 1;
+    if (dashboardCount) dashboardCount.textContent = dashboardEvents + " sample event" + (dashboardEvents === 1 ? "" : "s");
+    updateDashboardStats();
+    return formatTime(now);
+  }
+
+  function showTerminal(status, detail, denied) {
+    if (!dashboardTerminal) return;
+    dashboardTerminal.replaceChildren();
+    const symbol = document.createElement("span");
+    symbol.className = "terminal-wave";
+    symbol.textContent = denied ? "!" : "✓";
+    const heading = document.createElement("strong");
+    heading.textContent = status;
+    const copy = document.createElement("p");
+    copy.textContent = detail;
+    dashboardTerminal.append(symbol, heading, copy);
+  }
+
+  dashboardScan?.addEventListener("click", () => {
+    const time = addAccessLog({ holder: "Sample Student A", door: "Isulan Main Gate", result: "PASSED", message: "Entry recorded · sample transaction" });
+    showTerminal("ENTRY RECORDED", "Sample Student A · " + time, false);
   });
+
+  dashboardDenied?.addEventListener("click", () => {
+    const time = addAccessLog({ holder: "Unknown sample card", door: "Isulan Main Gate", result: "DENIED", message: "Access denied · sample transaction" });
+    showTerminal("ACCESS DENIED", "Unknown sample card · " + time, true);
+  });
+
+  function createUserRow(name, role, courseYear, rfid, userId) {
+    const row = document.createElement("tr");
+    row.dataset.userId = userId;
+    createCell(row, name);
+    createCell(row, role);
+    createCell(row, courseYear || "BSCpE - 4B");
+    createCell(row, rfid);
+    const actions = document.createElement("td");
+    actions.className = "table-actions";
+    ["edit", "delete"].forEach((action) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "table-action" + (action === "delete" ? " danger-action" : "");
+      button.dataset.userAction = action;
+      button.textContent = action === "edit" ? "Edit" : "Delete";
+      actions.append(button);
+    });
+    row.append(actions);
+    return row;
+  }
+
+  userForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const idField = document.getElementById("managed-user-id");
+    const name = document.getElementById("managed-name").value.trim();
+    const role = document.getElementById("managed-role").value;
+    const courseYear = document.getElementById("managed-course").value.trim() || "BSCpE - 4B";
+    const rfid = document.getElementById("managed-rfid").value.trim();
+    const notice = document.getElementById("user-form-status");
+    if (!name || !rfid) return;
+    const existing = idField.value ? userTable.querySelector('[data-user-id="' + idField.value + '"]') : null;
+    if (existing) {
+      existing.cells[0].textContent = name;
+      existing.cells[1].textContent = role;
+      existing.cells[2].textContent = courseYear;
+      existing.cells[3].textContent = rfid;
+      notice.textContent = "Local sample profile updated.";
+    } else {
+      userTable.append(createUserRow(name, role, courseYear, rfid, "user-" + Date.now()));
+      notice.textContent = "Local sample profile added.";
+    }
+    userForm.reset();
+    document.getElementById("managed-course").value = "BSCpE - 4B";
+    idField.value = "";
+    document.getElementById("user-submit").textContent = "Add user";
+    updateUserSelectors();
+    updateDashboardStats();
+  });
+
+  document.getElementById("user-reset")?.addEventListener("click", () => {
+    userForm?.reset();
+    document.getElementById("managed-user-id").value = "";
+    document.getElementById("managed-course").value = "BSCpE - 4B";
+    document.getElementById("user-submit").textContent = "Add user";
+    document.getElementById("user-form-status").textContent = "";
+  });
+
+  userTable?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-user-action]");
+    if (!button) return;
+    const row = button.closest("tr");
+    if (button.dataset.userAction === "edit") {
+      document.getElementById("managed-user-id").value = row.dataset.userId;
+      document.getElementById("managed-name").value = row.cells[0].textContent;
+      document.getElementById("managed-role").value = row.cells[1].textContent;
+      document.getElementById("managed-course").value = row.cells[2].textContent;
+      document.getElementById("managed-rfid").value = row.cells[3].textContent;
+      document.getElementById("user-submit").textContent = "Save changes";
+      document.getElementById("user-form-status").textContent = "Editing local sample profile.";
+      document.getElementById("managed-name").focus();
+    } else {
+      row.remove();
+      document.getElementById("user-form-status").textContent = "Local sample profile removed.";
+      updateUserSelectors();
+      updateDashboardStats();
+    }
+  });
+
+  function createCardRow(number, assigned, isBlocked) {
+    const row = document.createElement("tr");
+    createCell(row, number);
+    createCell(row, assigned || "Unassigned");
+    const stateCell = document.createElement("td");
+    const state = document.createElement("span");
+    state.className = "access-status " + (isBlocked ? "denied" : "passed");
+    state.textContent = isBlocked ? "Blocked" : "Active";
+    stateCell.append(state);
+    row.append(stateCell);
+    const actions = document.createElement("td");
+    actions.className = "table-actions";
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "table-action" + (isBlocked ? "" : " danger-action");
+    button.dataset.cardAction = isBlocked ? "activate" : "block";
+    button.textContent = isBlocked ? "Activate" : "Block";
+    actions.append(button);
+    row.append(actions);
+    return row;
+  }
+
+  cardForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const number = document.getElementById("card-number").value.trim();
+    const assigned = document.getElementById("card-user").value;
+    if (!number) return;
+    cardTable?.append(createCardRow(number, assigned, false));
+    cardForm.reset();
+    document.getElementById("card-form-status").textContent = "Card registered for this local sample session.";
+  });
+
+  cardTable?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-card-action]");
+    if (!button) return;
+    const row = button.closest("tr");
+    const blocked = button.dataset.cardAction === "block";
+    const state = row.cells[2].querySelector("span");
+    state.className = "access-status " + (blocked ? "denied" : "passed");
+    state.textContent = blocked ? "Blocked" : "Active";
+    button.dataset.cardAction = blocked ? "activate" : "block";
+    button.textContent = blocked ? "Activate" : "Block";
+    button.classList.toggle("danger-action", !blocked);
+  });
+
+  settingsForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const name = document.getElementById("door-name").value.trim();
+    const level = document.getElementById("access-level").value;
+    if (!name) return;
+    const item = document.createElement("li");
+    const label = document.createElement("span");
+    const heading = document.createElement("strong");
+    const description = document.createElement("small");
+    const badge = document.createElement("b");
+    heading.textContent = name;
+    description.textContent = "Local sample access point";
+    badge.textContent = level;
+    label.append(heading, description);
+    item.append(label, badge);
+    doorList?.append(item);
+    settingsForm.reset();
+    document.getElementById("settings-form-status").textContent = "Door or room added to this local session.";
+  });
+
+  const reportDate = document.getElementById("report-date");
+  const reportUser = document.getElementById("report-user");
+  const reportStatus = document.getElementById("report-status");
+  if (reportDate) reportDate.value = new Date().toISOString().slice(0, 10);
+  document.getElementById("report-preview")?.addEventListener("click", () => {
+    const date = reportDate?.value || "selected date";
+    const user = reportUser?.value || "All users";
+    reportStatus.textContent = "Preview prepared for " + user + " on " + date + ". " + dashboardEvents + " local sample access event" + (dashboardEvents === 1 ? " is" : "s are") + " available.";
+  });
+  document.getElementById("report-print")?.addEventListener("click", () => window.print());
+  document.getElementById("report-download")?.addEventListener("click", () => {
+    const lines = [["Time", "Card holder", "Door / room", "Result", "Monitor message"]];
+    dashboardLog?.querySelectorAll("tr:not(.dash-empty)").forEach((row) => lines.push(Array.from(row.cells).map((cell) => cell.textContent.trim())));
+    const csv = lines.map((line) => line.map((value) => '"' + value.replaceAll('"', '""') + '"').join(",")).join("\n");
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    link.download = "gatetap-access-report.csv";
+    link.click();
+    URL.revokeObjectURL(link.href);
+    reportStatus.textContent = "CSV download created from local sample events.";
+  });
+
+  updateUserSelectors();
+  updateDashboardStats();
 
   /*
     TODO: Add real, post-testing values here only after research evaluation.
