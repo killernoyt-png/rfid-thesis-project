@@ -189,6 +189,7 @@
     document.body.classList.add("app-active");
     dashboardView.classList.remove("sidebar-open");
     document.querySelector(".dashboard-menu")?.setAttribute("aria-expanded", "false");
+    selectDashboardPane("dashboard-overview", false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -234,24 +235,31 @@
     dashboardMenu.setAttribute("aria-expanded", String(open));
   });
 
+  function selectDashboardPane(paneId, moveFocus) {
+    const target = document.getElementById(paneId);
+    if (!target) return;
+    document.querySelectorAll(".dashboard-pane").forEach((pane) => {
+      pane.hidden = pane !== target;
+      pane.classList.remove("is-highlighted");
+    });
+    document.querySelectorAll(".dashboard-nav button").forEach((item) => {
+      const selected = item.dataset.dashboardTarget === paneId;
+      item.classList.toggle("active", selected);
+      item.toggleAttribute("aria-current", selected);
+    });
+    dashboardView.classList.remove("sidebar-open");
+    dashboardMenu?.setAttribute("aria-expanded", "false");
+    if (moveFocus) {
+      target.focus({ preventScroll: true });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.setTimeout(() => target.classList.add("is-highlighted"), 120);
+      window.setTimeout(() => target.classList.remove("is-highlighted"), 1400);
+    }
+  }
+
   document.querySelectorAll(".dashboard-nav button").forEach((button) => {
     button.addEventListener("click", () => {
-      const target = document.getElementById(button.dataset.dashboardTarget);
-      document.querySelectorAll(".dashboard-nav button").forEach((item) => {
-        item.classList.remove("active");
-        item.removeAttribute("aria-current");
-      });
-      button.classList.add("active");
-      button.setAttribute("aria-current", "page");
-      dashboardView.classList.remove("sidebar-open");
-      dashboardMenu?.setAttribute("aria-expanded", "false");
-      if (target) {
-        target.classList.remove("is-highlighted");
-        target.focus({ preventScroll: true });
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-        window.setTimeout(() => target.classList.add("is-highlighted"), 150);
-        window.setTimeout(() => target.classList.remove("is-highlighted"), 1450);
-      }
+      selectDashboardPane(button.dataset.dashboardTarget, true);
     });
   });
 

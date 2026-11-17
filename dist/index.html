@@ -60,6 +60,7 @@
         </nav>
         <div class="sidebar-footer"><span class="connection-dot"></span><span>Prototype mode<br><small>Local sample data</small></span></div>
         <button class="sidebar-site-link" type="button" data-open-public><span aria-hidden="true">↗</span> Thesis website</button>
+        <button class="sidebar-back-button" type="button" data-signout><span aria-hidden="true">←</span> Back to login</button>
       </aside>
       <div class="dashboard-main">
         <header class="dashboard-header">
@@ -68,8 +69,9 @@
           <div class="dashboard-user"><span class="user-dot" aria-hidden="true">GT</span><span><strong>GateTap portal</strong><small>Prototype session</small></span><button type="button" class="signout-button" data-signout>Sign out</button></div>
         </header>
         <main class="dashboard-content">
-          <div class="dash-welcome dashboard-section" id="dashboard-overview" tabindex="-1">
-            <div><h3>Gate overview</h3><p>Monitor sample entry and exit events while the hardware prototype is being evaluated.</p></div>
+          <section class="dashboard-pane active" id="dashboard-overview" tabindex="-1" aria-labelledby="overview-heading">
+          <div class="dash-welcome">
+            <div><h3 id="overview-heading">Gate overview</h3><p>Monitor sample entry and exit events while the hardware prototype is being evaluated.</p></div>
             <span class="dashboard-status"><i></i> Reader interface ready</span>
           </div>
           <section class="stat-grid" aria-label="Prototype status summary">
@@ -84,29 +86,44 @@
               <div class="terminal-display" id="dashboard-terminal" aria-live="polite"><span class="terminal-wave">⌁</span><strong>READY FOR RFID TAP</strong><p>Use the sample action to preview the gate response.</p></div>
               <button class="run-sample" type="button" id="dashboard-scan"><span aria-hidden="true">▣</span> Run sample RFID tap</button>
             </article>
-            <article class="reader-health dashboard-section" id="dashboard-rfid-cards" tabindex="-1">
-              <div class="panel-heading"><div><p class="panel-kicker">Hardware checklist</p><h3>Prototype status</h3></div><span class="muted-tag">No live device</span></div>
-              <ul class="health-list">
-                <li><span>RFID reader</span><b>Ready for setup</b></li>
-                <li><span>ESP32 edge device</span><b>Configuration pending</b></li>
-                <li><span>Raspberry Pi Zero W</span><b>Local server setup</b></li>
-                <li><span>HDMI monitor</span><b>Display test pending</b></li>
-              </ul>
-              <p class="hardware-note">Update these statuses once the final components are tested.</p>
+            <article class="overview-brief">
+              <div class="panel-heading"><div><p class="panel-kicker">System focus</p><h3>Prototype workflow</h3></div><span class="muted-tag">Sample view</span></div>
+              <ol class="overview-flow"><li><b>01</b><span>Student taps a passive RFID card.</span></li><li><b>02</b><span>The reader and ESP32 validate the tag.</span></li><li><b>03</b><span>The monitor and voice prompt confirm the event.</span></li></ol>
+              <p class="hardware-note">Open RFID Cards to view the component checklist.</p>
             </article>
           </section>
-          <section class="student-panel dashboard-section" id="dashboard-students" tabindex="-1" aria-labelledby="students-heading">
+          </section>
+          <section class="dashboard-pane" id="dashboard-students" tabindex="-1" aria-labelledby="students-heading" hidden>
+          <div class="student-panel">
             <div class="panel-heading"><div><p class="panel-kicker">Student monitoring</p><h3 id="students-heading">Student records</h3></div><span class="muted-tag">Sample profile</span></div>
             <div class="student-sample"><span class="sample-avatar" aria-hidden="true">SA</span><div><strong>Sample Student A</strong><p>Sample Course · Passive RFID card linked for demonstration</p></div><span class="sample-state">Ready for test</span></div>
             <p class="student-note">Real student details will appear only after approved profiles are added to the local database.</p>
+          </div>
           </section>
-          <section class="activity-panel dashboard-section" id="dashboard-activity" tabindex="-1" aria-labelledby="activity-heading">
+          <section class="dashboard-pane" id="dashboard-rfid-cards" tabindex="-1" aria-labelledby="rfid-cards-heading" hidden>
+          <article class="reader-health">
+            <div class="panel-heading"><div><p class="panel-kicker">Hardware checklist</p><h3 id="rfid-cards-heading">RFID card and reader setup</h3></div><span class="muted-tag">No live device</span></div>
+            <ul class="health-list">
+              <li><span>RFID reader</span><b>Ready for setup</b></li>
+              <li><span>Passive RFID cards</span><b>Sample tag only</b></li>
+              <li><span>ESP32 edge device</span><b>Configuration pending</b></li>
+              <li><span>Raspberry Pi Zero W</span><b>Local server setup</b></li>
+              <li><span>HDMI monitor</span><b>Display test pending</b></li>
+            </ul>
+            <p class="hardware-note">Update these statuses once the final components are tested.</p>
+          </article>
+          </section>
+          <section class="dashboard-pane" id="dashboard-activity" tabindex="-1" aria-labelledby="activity-heading" hidden>
+          <div class="activity-panel">
             <div class="panel-heading"><div><p class="panel-kicker">Sample activity</p><h3 id="activity-heading">Recent gate events</h3></div><span id="dashboard-count">No sample events</span></div>
             <div class="dashboard-table-wrap"><table><thead><tr><th>Time</th><th>Card holder</th><th>Event</th><th>Monitor message</th></tr></thead><tbody id="dashboard-log"><tr class="dash-empty"><td colspan="4">No RFID event has been simulated. This dashboard is not connected to student records.</td></tr></tbody></table></div>
+          </div>
           </section>
-          <section class="report-panel dashboard-section" id="dashboard-reports" tabindex="-1" aria-labelledby="reports-heading">
+          <section class="dashboard-pane" id="dashboard-reports" tabindex="-1" aria-labelledby="reports-heading" hidden>
+          <div class="report-panel">
             <div class="panel-heading"><div><p class="panel-kicker">Research reporting</p><h3 id="reports-heading">Evaluation reports</h3></div><span class="muted-tag">Testing pending</span></div>
             <div class="report-placeholder"><span aria-hidden="true">↗</span><div><strong>Results will be added after testing.</strong><p>Use this space for approved findings on scanning speed, tag detection accuracy, logging reliability, display and voice output, and user acceptability.</p></div></div>
+          </div>
           </section>
         </main>
       </div>
