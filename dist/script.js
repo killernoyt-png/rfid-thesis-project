@@ -182,8 +182,8 @@
     loginView.hidden = true;
     dashboardView.hidden = false;
     document.body.classList.add("app-active");
-    dashboardView.classList.remove("sidebar-open");
-    document.querySelector(".dashboard-menu")?.setAttribute("aria-expanded", "false");
+    dashboardView.classList.remove("sidebar-open", "sidebar-collapsed");
+    document.querySelector(".dashboard-menu")?.setAttribute("aria-expanded", String(!dashboardNarrow.matches));
     selectDashboardPane("dashboard-overview", false);
     updateDashboardStats();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -226,10 +226,31 @@
   });
 
   const dashboardMenu = document.querySelector(".dashboard-menu");
-  dashboardMenu?.addEventListener("click", () => {
-    const open = dashboardView.classList.toggle("sidebar-open");
-    dashboardMenu.setAttribute("aria-expanded", String(open));
+  const sidebarClose = document.querySelector(".sidebar-close");
+  const dashboardNarrow = window.matchMedia("(max-width: 880px)");
+  function syncDashboardMenu() {
+    if (!dashboardMenu) return;
+    const expanded = dashboardNarrow.matches
+      ? dashboardView.classList.contains("sidebar-open")
+      : !dashboardView.classList.contains("sidebar-collapsed");
+    dashboardMenu.setAttribute("aria-expanded", String(expanded));
+    dashboardMenu.setAttribute("aria-label", expanded ? "Collapse dashboard menu" : "Open dashboard menu");
+  }
+  function toggleDashboardSidebar() {
+    if (dashboardNarrow.matches) {
+      dashboardView.classList.toggle("sidebar-open");
+    } else {
+      dashboardView.classList.toggle("sidebar-collapsed");
+    }
+    syncDashboardMenu();
+  }
+  dashboardMenu?.addEventListener("click", toggleDashboardSidebar);
+  sidebarClose?.addEventListener("click", toggleDashboardSidebar);
+  dashboardNarrow.addEventListener("change", () => {
+    dashboardView.classList.remove("sidebar-open");
+    syncDashboardMenu();
   });
+  syncDashboardMenu();
 
   function selectDashboardPane(paneId, moveFocus) {
     const target = document.getElementById(paneId);
@@ -244,7 +265,7 @@
       item.toggleAttribute("aria-current", selected);
     });
     dashboardView.classList.remove("sidebar-open");
-    dashboardMenu?.setAttribute("aria-expanded", "false");
+    syncDashboardMenu();
     if (moveFocus) {
       target.focus({ preventScroll: true });
       window.scrollTo({ top: 0, behavior: "smooth" });

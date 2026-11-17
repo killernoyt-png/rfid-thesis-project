@@ -493,6 +493,23 @@ body.app-active .dashboard-nav button.active, body.app-active .dashboard-nav but
 body.app-active .dashboard-nav button.active::before, body.app-active .dashboard-nav button[aria-current="page"]::before { background: #b9ffd9; box-shadow: 0 0 10px rgb(185 255 217 / .7); }
 body.app-active .dashboard-nav button.active .nav-icon, body.app-active .dashboard-nav button[aria-current="page"] .nav-icon { color: #fff; background: rgb(255 255 255 / .18); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .25), 0 5px 11px rgb(0 102 58 / .18); }
 @media (max-width: 610px) { .photo-upload-control { align-items: flex-start; } .photo-upload-preview { flex-basis: 3.8rem; width: 3.8rem; height: 3.8rem; } }
+/* Official SKSU seal and a smooth collapsible desktop sidebar */
+.portal-mark, .sidebar-emblem, .brand-mark { background: #fff; }
+.portal-mark { flex-basis: 2.85rem; width: 2.85rem; height: 2.85rem; padding: 0; border: 0; box-shadow: 0 5px 14px rgb(7 65 47 / .16); }
+.sidebar-emblem { flex: 0 0 3rem; width: 3rem; height: 3rem; padding: 0; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 6px 14px rgb(7 65 47 / .15); }
+.sidebar-emblem img, .portal-mark img, .brand-mark img { border-radius: inherit; }
+body.app-active .dashboard-menu { display: grid; place-items: center; flex: 0 0 2.5rem; width: 2.5rem; height: 2.5rem; padding: 0; border: 1px solid #cfe6da; border-radius: .7rem; color: #155b45; background: #fff; box-shadow: 0 5px 12px rgb(13 93 69 / .07); line-height: 1; transition: transform .28s ease, color .28s ease, background .28s ease, box-shadow .28s ease; }
+body.app-active .dashboard-menu:hover { color: #fff; background: #129467; box-shadow: 0 8px 15px rgb(18 148 103 / .2); }
+body.app-active .dashboard-menu[aria-expanded="false"] { color: #155b45; background: #f7fcf9; }
+.sidebar-close { position: absolute; z-index: 2; top: 1.18rem; right: .82rem; display: none; place-items: center; width: 2rem; height: 2rem; padding: 0 0 .12rem; border: 1px solid #cde7d9; border-radius: 50%; color: #137653; background: rgb(255 255 255 / .92); box-shadow: 0 5px 12px rgb(17 105 75 / .1); font-size: 1.55rem; line-height: 1; transition: transform .25s ease, color .25s ease, background .25s ease; }
+.sidebar-close:hover { color: #fff; background: #129467; transform: translateX(-2px); }
+@media (min-width: 881px) {
+  .dashboard-view { transition: grid-template-columns .36s cubic-bezier(.2, .75, .25, 1); }
+  .dashboard-sidebar { width: 100%; min-width: 0; transition: width .36s cubic-bezier(.2, .75, .25, 1), padding .36s cubic-bezier(.2, .75, .25, 1), opacity .24s ease, transform .36s cubic-bezier(.2, .75, .25, 1), border-color .2s ease; }
+  .dashboard-view.sidebar-collapsed { grid-template-columns: 0 minmax(0, 1fr); }
+  .dashboard-view.sidebar-collapsed .dashboard-sidebar { width: 0; padding-inline: 0; border-right-color: transparent; opacity: 0; pointer-events: none; transform: translateX(-18px); }
+}
+@media (max-width: 880px) { .sidebar-close { display: grid; } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
