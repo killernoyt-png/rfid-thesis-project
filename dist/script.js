@@ -1,29 +1,8 @@
 (() => {
   "use strict";
 
-  const root = document.documentElement;
-  const themeToggle = document.querySelector(".theme-toggle");
   const menuToggle = document.querySelector(".menu-toggle");
   const navLinks = document.querySelector(".nav-links");
-
-  // Theme preference is local to this browser and safely optional.
-  try {
-    const storedTheme = localStorage.getItem("sksu-rfid-theme");
-    if (storedTheme === "dark") root.dataset.theme = "dark";
-  } catch (error) {
-    // localStorage may be unavailable in restrictive browsing contexts.
-  }
-
-  themeToggle?.addEventListener("click", () => {
-    const dark = root.dataset.theme !== "dark";
-    root.dataset.theme = dark ? "dark" : "";
-    themeToggle.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
-    try {
-      localStorage.setItem("sksu-rfid-theme", dark ? "dark" : "light");
-    } catch (error) {
-      // Keep the visual setting even if it cannot be saved.
-    }
-  });
 
   menuToggle?.addEventListener("click", () => {
     const open = menuToggle.getAttribute("aria-expanded") === "true";
