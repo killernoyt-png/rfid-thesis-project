@@ -152,7 +152,7 @@
     button.addEventListener("click", () => recordEvent(button.dataset.action));
   });
 
-  // GateTap is a front-end demonstration. It does not authenticate or retain credentials.
+  // GateTap runs locally in the browser; access fields are not sent to an external service.
   const loginView = document.getElementById("login-view");
   const dashboardView = document.getElementById("dashboard-view");
   const loginForm = document.getElementById("login-form");
@@ -174,6 +174,8 @@
   const cardTable = document.getElementById("card-table-body");
   const settingsForm = document.getElementById("settings-form");
   const doorList = document.getElementById("door-list");
+  const dashboardRTC = document.getElementById("dashboard-rtc");
+  const dashboardDate = document.getElementById("dashboard-date");
   const DASHBOARD_STORAGE_KEY = "gatetap-dashboard-state-v1";
   let dashboardEvents = 0;
   let deniedEvents = 0;
@@ -181,6 +183,18 @@
   let activeDashboardPane = "dashboard-overview";
   let lastTerminalState = null;
   let dashboardStateReady = false;
+
+  function updateDashboardRTC() {
+    const now = new Date();
+    if (dashboardRTC) dashboardRTC.textContent = formatTime(now);
+    if (dashboardDate) {
+      dashboardDate.textContent = new Intl.DateTimeFormat("en-PH", {
+        weekday: "short", month: "short", day: "numeric", year: "numeric"
+      }).format(now);
+    }
+  }
+  updateDashboardRTC();
+  window.setInterval(updateDashboardRTC, 1000);
 
   function getStoredDashboardState() {
     try {

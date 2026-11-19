@@ -23,7 +23,7 @@
         <div class="login-story">
           <p class="app-kicker"><span></span> College of Engineering · BSCpE</p>
           <h1>One tap.<br><em>A clearer gate.</em></h1>
-          <p>Access the prototype monitoring dashboard for the RFID-based student entry and exit system.</p>
+          <p>Access the RFID-based student entry and exit monitoring dashboard for SKSU Isulan Campus.</p>
           <div class="login-motif" aria-hidden="true">
             <span class="motif-card">RFID</span><span class="motif-wave wave-one"></span><span class="motif-wave wave-two"></span><span class="motif-reader">⌁</span>
           </div>
@@ -43,7 +43,7 @@
             <div class="login-options"><label><input type="checkbox"> <span>Keep me signed in on this device</span></label><button class="link-button" type="button">Forgot password?</button></div>
             <button class="portal-primary" type="submit">Sign in to dashboard <span aria-hidden="true">→</span></button>
           </form>
-          <p class="prototype-note"><span aria-hidden="true">ⓘ</span> Prototype interface only. Credentials are not sent or stored.</p>
+          <p class="portal-note"><span aria-hidden="true">ⓘ</span> University gate monitoring portal for authorized campus personnel.</p>
           <button class="public-site-link" type="button" data-open-public>View the thesis project website <span aria-hidden="true">↗</span></button>
         </div>
       </div>
@@ -72,7 +72,7 @@
         <header class="dashboard-header">
           <button class="dashboard-menu" type="button" aria-label="Toggle dashboard menu" aria-controls="dashboard-sidebar" aria-expanded="false">☰</button>
           <div><p class="app-kicker green"><span></span> RFID gate monitor</p><h2>Good day, <em>Research Team.</em></h2></div>
-          <div class="dashboard-user"><span class="user-dot" aria-hidden="true"><img src="sksu-seal.png" alt=""></span><span><strong>GateTap portal</strong><small>Prototype session</small></span><button type="button" class="signout-button" data-signout>Sign out</button></div>
+          <div class="dashboard-utilities"><div class="rtc-clock" aria-live="polite"><span>Campus time</span><strong id="dashboard-rtc">--:--:--</strong><small id="dashboard-date">Loading date</small></div><div class="dashboard-user"><span class="user-dot" aria-hidden="true"><img src="sksu-seal.png" alt=""></span><span><strong>GateTap portal</strong><small>Campus session</small></span><button type="button" class="signout-button" data-signout>Sign out</button></div></div>
         </header>
         <main class="dashboard-content">
           <section class="dashboard-pane active" id="dashboard-overview" tabindex="-1" aria-labelledby="overview-heading">
@@ -81,19 +81,19 @@
             <div class="reader-status-card"><span class="reader-chip" aria-hidden="true"><i></i><i></i><i></i></span><div><p>RFID gate reader</p><strong>Operational</strong><small><i></i> Ready for the next tap</small></div></div>
           </section>
           <section class="stat-grid overview-stat-grid" aria-label="Gate monitoring summary">
-            <article class="overview-stat users-stat"><div class="stat-heading"><span class="stat-icon green-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.2" cy="7.2" r="2.8"/><circle cx="16.8" cy="8.5" r="2.2"/><path d="M3.1 19c.55-3.15 2.45-4.95 5.1-4.95s4.55 1.8 5.1 4.95M14.6 14.5c2.55.1 4.05 1.45 4.45 4.1"/></svg></span><p>Total users</p></div><strong id="dashboard-total-users">1</strong><small>Profiles in this local session</small><span class="stat-foot">User directory <b>→</b></span></article>
-            <article class="overview-stat taps-stat"><div class="stat-heading"><span class="stat-icon gold-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8.2" width="10.8" height="7.8" rx="1.2"/><circle cx="6.2" cy="11.3" r="1.15"/><path d="M8.9 10.5h2.4M8.9 13.2h2.4M17.1 5.3c2.4 1 3.9 2.8 3.9 5.1M16.3 8.4c1.25.5 2.05 1.35 2.05 2.45M14.7 16.5l2.3-2.3 1.3 1.3-2.3 2.3M13.4 17.8l1.3-1.3 1.3 1.3"/></svg></span><p>Tap-ins today</p></div><strong id="dashboard-total-taps">0</strong><small>Approved sample entries</small><span class="stat-foot">Today’s activity <b>↗</b></span></article>
-            <article class="overview-stat denied-stat"><div class="stat-heading"><span class="stat-icon maroon-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5.2v8.1"/><path d="M12 18.3v.1"/></svg></span><p>Unauthorized attempts</p></div><strong id="dashboard-unauthorized">0</strong><small>Denied sample entries</small><span class="stat-foot">Security watch <b>!</b></span></article>
+            <article class="overview-stat users-stat"><div class="stat-heading"><span class="stat-icon green-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.2" cy="7.2" r="2.8"/><circle cx="16.8" cy="8.5" r="2.2"/><path d="M3.1 19c.55-3.15 2.45-4.95 5.1-4.95s4.55 1.8 5.1 4.95M14.6 14.5c2.55.1 4.05 1.45 4.45 4.1"/></svg></span><p>Total users</p></div><strong id="dashboard-total-users">1</strong><small>Saved campus profiles</small><span class="stat-foot">User directory</span></article>
+            <article class="overview-stat taps-stat"><div class="stat-heading"><span class="stat-icon gold-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3" y="8.2" width="10.8" height="7.8" rx="1.2"/><circle cx="6.2" cy="11.3" r="1.15"/><path d="M8.9 10.5h2.4M8.9 13.2h2.4M17.1 5.3c2.4 1 3.9 2.8 3.9 5.1M16.3 8.4c1.25.5 2.05 1.35 2.05 2.45M14.7 16.5l2.3-2.3 1.3 1.3-2.3 2.3M13.4 17.8l1.3-1.3 1.3 1.3"/></svg></span><p>Tap-ins today</p></div><strong id="dashboard-total-taps">0</strong><small>Approved gate entries</small><span class="stat-foot">Today’s activity</span></article>
+            <article class="overview-stat denied-stat"><div class="stat-heading"><span class="stat-icon maroon-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5.2v8.1"/><path d="M12 18.3v.1"/></svg></span><p>Unauthorized attempts</p></div><strong id="dashboard-unauthorized">0</strong><small>Denied gate entries</small><span class="stat-foot">Security watch</span></article>
             <article class="overview-stat system-stat"><div class="stat-heading"><span class="stat-icon blue-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.4"/><path d="M7.3 7.3a6.7 6.7 0 0 0 0 9.4M4.5 4.5a10.6 10.6 0 0 0 0 15M16.7 7.3a6.7 6.7 0 0 1 0 9.4M19.5 4.5a10.6 10.6 0 0 1 0 15"/></svg></span><p>Gate status</p></div><strong>Ready</strong><small>Reader interface connected</small><span class="stat-foot"><i></i> System online</span></article>
           </section>
           <section class="dashboard-grid">
             <article class="live-terminal">
               <div class="panel-heading"><div><p class="panel-kicker">Live access console</p><h3>Gate terminal</h3></div><span class="live-tag"><i></i> READY</span></div>
-              <div class="terminal-display" id="dashboard-terminal" aria-live="polite"><span class="terminal-wave">RF</span><strong>READY FOR RFID TAP</strong><p>Use a sample action to preview the gate response.</p></div>
-              <div class="terminal-actions"><button class="run-sample" type="button" id="dashboard-scan"><span aria-hidden="true">✓</span> Simulate approved tap</button><button class="run-sample run-denied" type="button" id="dashboard-denied"><span aria-hidden="true">!</span> Simulate denied tap</button></div>
+              <div class="terminal-display" id="dashboard-terminal" aria-live="polite"><span class="terminal-wave">RF</span><strong>READY FOR RFID TAP</strong><p>Gate reader is ready for the next card.</p></div>
+              <div class="terminal-actions"><button class="run-sample" type="button" id="dashboard-scan"><span aria-hidden="true">✓</span> Record approved tap</button><button class="run-sample run-denied" type="button" id="dashboard-denied"><span aria-hidden="true">!</span> Record denied tap</button></div>
             </article>
             <article class="overview-brief">
-              <div class="panel-heading"><div><p class="panel-kicker">System focus</p><h3>Prototype workflow</h3></div><span class="muted-tag">Sample view</span></div>
+              <div class="panel-heading"><div><p class="panel-kicker">System focus</p><h3>Gate workflow</h3></div><span class="muted-tag">Live view</span></div>
               <ol class="overview-flow"><li><b>01</b><span>Student taps a passive RFID card.</span></li><li><b>02</b><span>The reader and ESP32 validate the tag.</span></li><li><b>03</b><span>The monitor and voice prompt confirm the event.</span></li></ol>
               <p class="hardware-note">Use the side menu to manage users, cards, logs, reports, and access settings.</p>
             </article>
@@ -229,7 +229,7 @@
       <div class="shell">
         <div class="section-heading split-heading reveal">
           <div><p class="eyebrow green"><span></span> The context</p><h2>When the gate queue<br>becomes the problem.</h2></div>
-          <p>Manual guard logs and paper sign-in sheets make arrival time slower and harder to trust. This project proposes a clear, traceable alternative for the SKSU Isulan main gate prototype.</p>
+          <p>Manual guard logs and paper sign-in sheets make arrival time slower and harder to trust. This project provides a clear, traceable alternative for the SKSU Isulan main gate.</p>
         </div>
         <div class="problem-grid reveal">
           <article class="issue-card"><span class="icon-icon" aria-hidden="true">⌛</span><h3>Peak-hour bottlenecks</h3><p>Paper entries slow down arrival and departure during busy periods.</p></article>
@@ -261,13 +261,13 @@
       <div class="shell objective-layout">
         <div class="objective-intro reveal">
           <p class="eyebrow light"><span></span> Research objectives</p>
-          <h2>A prototype that makes every gate event <em>accountable.</em></h2>
+          <h2>A system that makes every gate event <em>accountable.</em></h2>
           <div class="general-objective"><span>General objective</span><p>To develop an RFID-based student entry and exit monitoring system with voice notification and digital display.</p></div>
         </div>
         <div class="accordion reveal" data-accordion>
           <article class="accordion-item active">
-            <button aria-expanded="true"><span>01</span><strong>Build the hardware prototype</strong><i aria-hidden="true">+</i></button>
-            <div class="accordion-panel"><p>Design and construct the prototype using a microcontroller, RFID reader, voice module, and monitor.</p></div>
+            <button aria-expanded="true"><span>01</span><strong>Build the gate monitoring system</strong><i aria-hidden="true">+</i></button>
+            <div class="accordion-panel"><p>Design and construct the system using a microcontroller, RFID reader, voice module, and monitor.</p></div>
           </article>
           <article class="accordion-item">
             <button aria-expanded="false"><span>02</span><strong>Develop the monitoring software</strong><i aria-hidden="true">+</i></button>
@@ -289,7 +289,7 @@
       <div class="shell">
         <div class="section-heading split-heading reveal">
           <div><p class="eyebrow green"><span></span> System architecture</p><h2>From tap to<br>trusted record.</h2></div>
-          <p>Select a component to see its role in the prototype. The diagram reflects the proposed system architecture.</p>
+          <p>Select a component to see its role in the system. The diagram reflects the planned system architecture.</p>
         </div>
         <!-- Update this diagram if the final hardware roles change. -->
         <div class="architecture-card reveal">
@@ -315,7 +315,7 @@
 
     <section class="section demo-section" id="demo">
       <div class="shell">
-        <div class="demo-heading reveal"><div><p class="eyebrow light"><span></span> Interactive prototype</p><h2>Try the gate<br><em>simulation.</em></h2></div><p>See the designed feedback flow below. This interface uses sample data only and does not connect to student records.</p></div>
+        <div class="demo-heading reveal"><div><p class="eyebrow light"><span></span> Gate monitoring</p><h2>View the gate<br><em>activity.</em></h2></div><p>Review the intended feedback flow for RFID entry and exit activity at the campus gate.</p></div>
         <div class="simulation-notice reveal" role="note"><span aria-hidden="true">ⓘ</span> <strong>Simulation with sample data. Not real student records.</strong></div>
         <div class="demo-layout reveal">
           <div class="demo-controls">
@@ -330,7 +330,7 @@
             <div class="screen-main" id="screen-main">
               <div class="screen-symbol">⌁</div><p class="screen-prompt">READY FOR<br><strong>RFID TAP</strong></p><p class="screen-sub">Present a card to begin a sample transaction.</p>
             </div>
-            <div class="screen-footer"><span>LOCAL PROTOTYPE</span><span id="screen-clock">--:--:--</span></div>
+            <div class="screen-footer"><span>SKSU GATETAP</span><span id="screen-clock">--:--:--</span></div>
           </div>
         </div>
         <div class="log-wrap reveal">
@@ -358,8 +358,8 @@
       <div class="shell scope-layout reveal">
         <div><p class="eyebrow light"><span></span> Scope &amp; limitations</p><h2>Focused for a<br><em>real gate setting.</em></h2></div>
         <div class="scope-list">
-          <article><b>01</b><p><strong>Passive cards only.</strong> The prototype is designed for passive RFID cards; it does not support long-range or active tags.</p></article>
-          <article><b>02</b><p><strong>Local prototype setting.</strong> The intended deployment context is the SKSU Isulan main gate.</p></article>
+          <article><b>01</b><p><strong>Passive cards only.</strong> The system is designed for passive RFID cards; it does not support long-range or active tags.</p></article>
+          <article><b>02</b><p><strong>Campus gate setting.</strong> The intended deployment context is the SKSU Isulan main gate.</p></article>
           <article><b>03</b><p><strong>Fixed English prompts.</strong> “Entry Recorded,” “Exit Recorded,” and “Access Denied” are pre-set; dynamic name pronunciation and multilingual output are outside scope.</p></article>
           <article><b>04</b><p><strong>Local data workflow.</strong> The design uses a local database with local server synchronization.</p></article>
         </div>
@@ -380,7 +380,7 @@
           <div class="tab-panels">
             <article id="benefit-administration" role="tabpanel" aria-labelledby="tab-administration"><span>01</span><h3>Administration</h3><p>Structured event records can support more informed oversight of gate activity and future reporting needs.</p></article>
             <article id="benefit-security" role="tabpanel" aria-labelledby="tab-security" hidden><span>02</span><h3>Security personnel</h3><p>Visual and voice feedback can reduce reliance on handwritten logs and simplify routine gate confirmation.</p></article>
-            <article id="benefit-students" role="tabpanel" aria-labelledby="tab-students" hidden><span>03</span><h3>Students</h3><p>A quick RFID tap offers a clear, contactless way to confirm entry or exit at the prototype gate.</p></article>
+            <article id="benefit-students" role="tabpanel" aria-labelledby="tab-students" hidden><span>03</span><h3>Students</h3><p>A quick RFID tap offers a clear, contactless way to confirm entry or exit at the campus gate.</p></article>
             <article id="benefit-visitors" role="tabpanel" aria-labelledby="tab-visitors" hidden><span>04</span><h3>Visitors</h3><p>A more orderly gate process can help make campus arrivals easier to understand and navigate.</p></article>
             <article id="benefit-faculty" role="tabpanel" aria-labelledby="tab-faculty" hidden><span>05</span><h3>Faculty &amp; staff</h3><p>Clearer gate activity records can support campus operations and institutional coordination.</p></article>
           </div>
@@ -402,8 +402,8 @@
         <div class="section-heading centered reveal"><p class="eyebrow light"><span></span> Research methodology &amp; evaluation</p><h2>A practical path<br>to <em>assessment.</em></h2></div>
         <ol class="method-steps reveal">
           <li><b>01</b><h3>Design</h3><p>Define the gate flow, components, and required feedback.</p></li>
-          <li><b>02</b><h3>Build</h3><p>Construct the integrated hardware and software prototype.</p></li>
-          <li><b>03</b><h3>Test</h3><p>Observe transactions and component output in the prototype setting.</p></li>
+          <li><b>02</b><h3>Build</h3><p>Construct the integrated hardware and software system.</p></li>
+          <li><b>03</b><h3>Test</h3><p>Observe transactions and component output in the campus setting.</p></li>
           <li><b>04</b><h3>Evaluate</h3><p>Assess performance, reliability, and user acceptability.</p></li>
         </ol>
         <div class="criteria reveal"><span>Evaluation criteria</span><p>Scanning speed · Tag detection accuracy · Logging reliability · Display and voice output · User acceptability</p></div>
@@ -423,7 +423,7 @@
 
     <section class="section team-section" id="team">
       <div class="shell">
-        <div class="section-heading centered reveal"><p class="eyebrow green"><span></span> The people behind the prototype</p><h2>Designed at<br><em>SKSU Isulan.</em></h2><p>College of Engineering · Bachelor of Science in Computer Engineering</p></div>
+        <div class="section-heading centered reveal"><p class="eyebrow green"><span></span> The people behind the system</p><h2>Designed at<br><em>SKSU Isulan.</em></h2><p>College of Engineering · Bachelor of Science in Computer Engineering</p></div>
         <div class="team-grid reveal">
           <!-- TODO: Replace initials placeholders with approved team photos, if desired. -->
           <article class="person-card researcher"><div class="person-avatar">HF</div><span>Researcher</span><h3>Henchel L. Feller</h3></article>
