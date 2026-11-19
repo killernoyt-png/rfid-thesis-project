@@ -18,8 +18,8 @@
   --orange: #d97528;
   --blue: #5195c4;
   --shadow: 0 18px 60px rgb(19 36 30 / .10);
-  --font-body: "DM Sans", system-ui, sans-serif;
-  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Open Sans", Arial, sans-serif;
+  --font-display: "Merriweather", Georgia, serif;
   color-scheme: light;
 }
 
@@ -503,6 +503,12 @@ body.app-active .dashboard-menu:hover { color: #fff; background: #129467; box-sh
 body.app-active .dashboard-menu[aria-expanded="false"] { color: #155b45; background: #f7fcf9; }
 .sidebar-close { position: absolute; z-index: 2; top: 1.18rem; right: .82rem; display: none; place-items: center; width: 2rem; height: 2rem; padding: 0 0 .12rem; border: 1px solid #cde7d9; border-radius: 50%; color: #137653; background: rgb(255 255 255 / .92); box-shadow: 0 5px 12px rgb(17 105 75 / .1); font-size: 1.55rem; line-height: 1; transition: transform .25s ease, color .25s ease, background .25s ease; }
 .sidebar-close:hover { color: #fff; background: #129467; transform: translateX(-2px); }
+.user-dot { overflow: hidden; border: 1px solid #c6e5d4; background: #fff; box-shadow: 0 4px 10px rgb(16 95 67 / .12); }
+.user-dot img { display: block; width: 100%; height: 100%; object-fit: contain; }
+/* Typography system: Open Sans for interface copy, Merriweather for every heading. */
+body, button, input, select, textarea { font-family: var(--font-body); }
+h1, h2, h3, h4, h5, h6, .dashboard-header h2, .overview-hero h3 { font-family: var(--font-display); }
+.terminal-display, .gate-screen { font-family: var(--font-body); }
 @media (min-width: 881px) {
   .dashboard-view { transition: grid-template-columns .36s cubic-bezier(.2, .75, .25, 1); }
   .dashboard-sidebar { width: 100%; min-width: 0; transition: width .36s cubic-bezier(.2, .75, .25, 1), padding .36s cubic-bezier(.2, .75, .25, 1), opacity .24s ease, transform .36s cubic-bezier(.2, .75, .25, 1), border-color .2s ease; }
