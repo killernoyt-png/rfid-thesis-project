@@ -174,17 +174,82 @@
   const cardTable = document.getElementById("card-table-body");
   const settingsForm = document.getElementById("settings-form");
   const doorList = document.getElementById("door-list");
+  const DASHBOARD_STORAGE_KEY = "gatetap-dashboard-state-v1";
   let dashboardEvents = 0;
   let deniedEvents = 0;
   let selectedProfilePhoto = "";
+  let activeDashboardPane = "dashboard-overview";
+  let lastTerminalState = null;
+  let dashboardStateReady = false;
+
+  function getStoredDashboardState() {
+    try {
+      const stored = window.localStorage.getItem(DASHBOARD_STORAGE_KEY);
+      if (!stored) return null;
+      const state = JSON.parse(stored);
+      return state && typeof state === "object" ? state : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function cellText(row, index) {
+    return row?.cells[index]?.textContent.trim() || "";
+  }
+
+  function persistDashboardState() {
+    if (!dashboardStateReady) return true;
+    const state = {
+      users: currentUserRows().map((row) => ({
+        id: row.dataset.userId || "user-" + Date.now(),
+        name: row.dataset.userName || cellText(row, 1),
+        role: cellText(row, 2),
+        courseYear: cellText(row, 3),
+        rfid: cellText(row, 4),
+        photo: row.dataset.photo || ""
+      })),
+      cards: Array.from(cardTable?.querySelectorAll("tr") || []).map((row) => ({
+        number: cellText(row, 0),
+        assigned: cellText(row, 1),
+        blocked: cellText(row, 2) === "Blocked"
+      })),
+      logs: Array.from(dashboardLog?.querySelectorAll("tr:not(.dash-empty)") || []).map((row) => ({
+        time: cellText(row, 0),
+        holder: cellText(row, 1),
+        door: cellText(row, 2),
+        result: cellText(row, 3),
+        message: cellText(row, 4)
+      })),
+      doors: Array.from(doorList?.querySelectorAll("li") || []).map((item) => ({
+        name: item.querySelector("strong")?.textContent.trim() || "",
+        description: item.querySelector("small")?.textContent.trim() || "",
+        level: item.querySelector("b")?.textContent.trim() || ""
+      })).filter((door) => door.name),
+      dashboardEvents,
+      deniedEvents,
+      activePane: activeDashboardPane,
+      sidebarCollapsed: dashboardView.classList.contains("sidebar-collapsed"),
+      terminal: lastTerminalState,
+      report: {
+        date: document.getElementById("report-date")?.value || "",
+        user: document.getElementById("report-user")?.value || "All users"
+      }
+    };
+    try {
+      window.localStorage.setItem(DASHBOARD_STORAGE_KEY, JSON.stringify(state));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 
   function showDashboard() {
     loginView.hidden = true;
     dashboardView.hidden = false;
     document.body.classList.add("app-active");
-    dashboardView.classList.remove("sidebar-open", "sidebar-collapsed");
+    dashboardView.classList.remove("sidebar-open");
     document.querySelector(".dashboard-menu")?.setAttribute("aria-expanded", String(!dashboardNarrow.matches));
-    selectDashboardPane("dashboard-overview", false);
+    selectDashboardPane(activeDashboardPane, false);
     updateDashboardStats();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -243,6 +308,7 @@
       dashboardView.classList.toggle("sidebar-collapsed");
     }
     syncDashboardMenu();
+    persistDashboardState();
   }
   dashboardMenu?.addEventListener("click", toggleDashboardSidebar);
   sidebarClose?.addEventListener("click", toggleDashboardSidebar);
@@ -255,6 +321,7 @@
   function selectDashboardPane(paneId, moveFocus) {
     const target = document.getElementById(paneId);
     if (!target) return;
+    activeDashboardPane = paneId;
     document.querySelectorAll(".dashboard-pane").forEach((pane) => {
       pane.hidden = pane !== target;
       pane.classList.remove("is-highlighted");
@@ -272,6 +339,7 @@
       window.setTimeout(() => target.classList.add("is-highlighted"), 120);
       window.setTimeout(() => target.classList.remove("is-highlighted"), 1400);
     }
+    persistDashboardState();
   }
 
   document.querySelectorAll("[data-dashboard-target]").forEach((button) => {
@@ -327,7 +395,7 @@
     if (totalUsers) totalUsers.textContent = String(userTotal);
     if (totalTaps) totalTaps.textContent = String(dashboardEvents);
     if (unauthorizedAttempts) unauthorizedAttempts.textContent = String(deniedEvents);
-    if (userCount) userCount.textContent = userTotal + " sample " + (userTotal === 1 ? "user" : "users");
+    if (userCount) userCount.textContent = userTotal + " saved " + (userTotal === 1 ? "user" : "users");
   }
 
   function updateUserSelectors() {
@@ -366,12 +434,19 @@
     }
   }
 
-  function addAccessLog({ holder, door, result, message }) {
-    const now = new Date();
-    const emptyDashboard = dashboardLog?.querySelector(".dash-empty");
-    if (emptyDashboard) emptyDashboard.remove();
+  function createEmptyDashboardLog() {
     const row = document.createElement("tr");
-    createCell(row, formatTime(now));
+    row.className = "dash-empty";
+    const cell = document.createElement("td");
+    cell.colSpan = 5;
+    cell.textContent = "No RFID event has been recorded yet. New activity is saved in this browser.";
+    row.append(cell);
+    return row;
+  }
+
+  function createAccessLogRow({ time, holder, door, result, message }) {
+    const row = document.createElement("tr");
+    createCell(row, time);
     createCell(row, holder);
     createCell(row, door);
     const stateCell = document.createElement("td");
@@ -381,16 +456,25 @@
     stateCell.append(state);
     row.append(stateCell);
     createCell(row, message);
+    return row;
+  }
+
+  function addAccessLog({ holder, door, result, message }) {
+    const now = new Date();
+    const emptyDashboard = dashboardLog?.querySelector(".dash-empty");
+    if (emptyDashboard) emptyDashboard.remove();
+    const row = createAccessLogRow({ time: formatTime(now), holder, door, result, message });
     dashboardLog?.prepend(row);
     dashboardEvents += 1;
     if (result === "DENIED") deniedEvents += 1;
-    if (dashboardCount) dashboardCount.textContent = dashboardEvents + " sample event" + (dashboardEvents === 1 ? "" : "s");
+    if (dashboardCount) dashboardCount.textContent = dashboardEvents + " saved event" + (dashboardEvents === 1 ? "" : "s");
     updateDashboardStats();
     return formatTime(now);
   }
 
   function showTerminal(status, detail, denied) {
     if (!dashboardTerminal) return;
+    lastTerminalState = { status, detail, denied: Boolean(denied) };
     dashboardTerminal.replaceChildren();
     const symbol = document.createElement("span");
     symbol.className = "terminal-wave";
@@ -405,11 +489,13 @@
   dashboardScan?.addEventListener("click", () => {
     const time = addAccessLog({ holder: "Sample Student A", door: "Isulan Main Gate", result: "PASSED", message: "Entry recorded · sample transaction" });
     showTerminal("ENTRY RECORDED", "Sample Student A · " + time, false);
+    persistDashboardState();
   });
 
   dashboardDenied?.addEventListener("click", () => {
     const time = addAccessLog({ holder: "Unknown sample card", door: "Isulan Main Gate", result: "DENIED", message: "Access denied · sample transaction" });
     showTerminal("ACCESS DENIED", "Unknown sample card · " + time, true);
+    persistDashboardState();
   });
 
   function createUserRow(name, role, courseYear, rfid, userId, photoSource) {
@@ -477,10 +563,10 @@
       existing.cells[2].textContent = role;
       existing.cells[3].textContent = courseYear;
       existing.cells[4].textContent = rfid;
-      notice.textContent = "Local sample profile updated.";
+      notice.textContent = "Profile updated and saved in this browser.";
     } else {
       userTable.append(createUserRow(name, role, courseYear, rfid, "user-" + Date.now(), selectedProfilePhoto));
-      notice.textContent = "Local sample profile added.";
+      notice.textContent = "Profile added and saved in this browser.";
     }
     userForm.reset();
     resetPhotoSelection();
@@ -489,6 +575,7 @@
     document.getElementById("user-submit").textContent = "Add user";
     updateUserSelectors();
     updateDashboardStats();
+    if (!persistDashboardState()) notice.textContent = "Profile updated, but this browser could not save it.";
   });
 
   document.getElementById("user-reset")?.addEventListener("click", () => {
@@ -513,13 +600,15 @@
       selectedProfilePhoto = row.dataset.photo || "";
       setPhotoPreview(row.dataset.userName || row.cells[1].textContent, selectedProfilePhoto);
       document.getElementById("user-submit").textContent = "Save changes";
-      document.getElementById("user-form-status").textContent = "Editing local sample profile.";
+      document.getElementById("user-form-status").textContent = "Editing saved profile.";
       document.getElementById("managed-name").focus();
     } else {
       row.remove();
-      document.getElementById("user-form-status").textContent = "Local sample profile removed.";
+      const notice = document.getElementById("user-form-status");
+      notice.textContent = "Profile removed and saved in this browser.";
       updateUserSelectors();
       updateDashboardStats();
+      if (!persistDashboardState()) notice.textContent = "Profile removed, but this browser could not save the change.";
     }
   });
 
@@ -545,6 +634,20 @@
     return row;
   }
 
+  function createDoorItem(name, level, description) {
+    const item = document.createElement("li");
+    const label = document.createElement("span");
+    const heading = document.createElement("strong");
+    const copy = document.createElement("small");
+    const badge = document.createElement("b");
+    heading.textContent = name;
+    copy.textContent = description || "Saved access point";
+    badge.textContent = level;
+    label.append(heading, copy);
+    item.append(label, badge);
+    return item;
+  }
+
   cardForm?.addEventListener("submit", (event) => {
     event.preventDefault();
     const number = document.getElementById("card-number").value.trim();
@@ -552,7 +655,9 @@
     if (!number) return;
     cardTable?.append(createCardRow(number, assigned, false));
     cardForm.reset();
-    document.getElementById("card-form-status").textContent = "Card registered for this local sample session.";
+    const notice = document.getElementById("card-form-status");
+    notice.textContent = "Card registered and saved in this browser.";
+    if (!persistDashboardState()) notice.textContent = "Card registered, but this browser could not save it.";
   });
 
   cardTable?.addEventListener("click", (event) => {
@@ -566,6 +671,7 @@
     button.dataset.cardAction = blocked ? "activate" : "block";
     button.textContent = blocked ? "Activate" : "Block";
     button.classList.toggle("danger-action", !blocked);
+    persistDashboardState();
   });
 
   settingsForm?.addEventListener("submit", (event) => {
@@ -573,30 +679,78 @@
     const name = document.getElementById("door-name").value.trim();
     const level = document.getElementById("access-level").value;
     if (!name) return;
-    const item = document.createElement("li");
-    const label = document.createElement("span");
-    const heading = document.createElement("strong");
-    const description = document.createElement("small");
-    const badge = document.createElement("b");
-    heading.textContent = name;
-    description.textContent = "Local sample access point";
-    badge.textContent = level;
-    label.append(heading, description);
-    item.append(label, badge);
-    doorList?.append(item);
+    doorList?.append(createDoorItem(name, level, "Saved access point"));
     settingsForm.reset();
-    document.getElementById("settings-form-status").textContent = "Door or room added to this local session.";
+    const notice = document.getElementById("settings-form-status");
+    notice.textContent = "Door or room added and saved in this browser.";
+    if (!persistDashboardState()) notice.textContent = "Door added, but this browser could not save it.";
   });
 
   const reportDate = document.getElementById("report-date");
   const reportUser = document.getElementById("report-user");
   const reportStatus = document.getElementById("report-status");
-  if (reportDate) reportDate.value = new Date().toISOString().slice(0, 10);
+
+  function restoreDashboardState(state) {
+    if (!state) return false;
+    if (Array.isArray(state.users) && userTable) {
+      userTable.replaceChildren();
+      state.users.filter((user) => user && user.name).forEach((user, index) => {
+        userTable.append(createUserRow(
+          user.name,
+          user.role || "Student",
+          user.courseYear || "BSCpE - 4B",
+          user.rfid || "",
+          user.id || "saved-user-" + index,
+          user.photo || ""
+        ));
+      });
+    }
+    if (Array.isArray(state.cards) && cardTable) {
+      cardTable.replaceChildren();
+      state.cards.filter((card) => card && card.number).forEach((card) => {
+        cardTable.append(createCardRow(card.number, card.assigned || "", Boolean(card.blocked)));
+      });
+    }
+    if (Array.isArray(state.logs) && dashboardLog) {
+      dashboardLog.replaceChildren();
+      state.logs.filter((log) => log && log.time).forEach((log) => dashboardLog.append(createAccessLogRow({
+        time: log.time,
+        holder: log.holder || "Unknown card",
+        door: log.door || "Isulan Main Gate",
+        result: log.result === "PASSED" ? "PASSED" : "DENIED",
+        message: log.message || "Saved access record"
+      })));
+      if (!dashboardLog.children.length) dashboardLog.append(createEmptyDashboardLog());
+    }
+    if (Array.isArray(state.doors) && doorList) {
+      doorList.replaceChildren();
+      state.doors.forEach((door) => {
+        if (door?.name) doorList.append(createDoorItem(door.name, door.level || "Student", door.description));
+      });
+    }
+    dashboardEvents = Number.isFinite(state.dashboardEvents) ? Math.max(0, state.dashboardEvents) : (state.logs?.length || 0);
+    deniedEvents = Number.isFinite(state.deniedEvents) ? Math.max(0, state.deniedEvents) : (state.logs || []).filter((log) => log?.result === "DENIED").length;
+    activeDashboardPane = document.getElementById(state.activePane) ? state.activePane : "dashboard-overview";
+    dashboardView.classList.toggle("sidebar-collapsed", Boolean(state.sidebarCollapsed));
+    if (state.terminal?.status && state.terminal?.detail) {
+      showTerminal(state.terminal.status, state.terminal.detail, state.terminal.denied);
+    }
+    updateUserSelectors();
+    if (reportDate) reportDate.value = state.report?.date || new Date().toISOString().slice(0, 10);
+    if (reportUser && state.report?.user) reportUser.value = state.report.user;
+    return true;
+  }
+
+  const dashboardWasRestored = restoreDashboardState(getStoredDashboardState());
+  if (reportDate && !dashboardWasRestored) reportDate.value = new Date().toISOString().slice(0, 10);
   document.getElementById("report-preview")?.addEventListener("click", () => {
     const date = reportDate?.value || "selected date";
     const user = reportUser?.value || "All users";
-    reportStatus.textContent = "Preview prepared for " + user + " on " + date + ". " + dashboardEvents + " local sample access event" + (dashboardEvents === 1 ? " is" : "s are") + " available.";
+    reportStatus.textContent = "Preview prepared for " + user + " on " + date + ". " + dashboardEvents + " saved access event" + (dashboardEvents === 1 ? " is" : "s are") + " available.";
+    persistDashboardState();
   });
+  reportDate?.addEventListener("change", persistDashboardState);
+  reportUser?.addEventListener("change", persistDashboardState);
   document.getElementById("report-print")?.addEventListener("click", () => window.print());
   document.getElementById("report-download")?.addEventListener("click", () => {
     const lines = [["Time", "Card holder", "Door / room", "Result", "Monitor message"]];
@@ -607,11 +761,14 @@
     link.download = "gatetap-access-report.csv";
     link.click();
     URL.revokeObjectURL(link.href);
-    reportStatus.textContent = "CSV download created from local sample events.";
+    reportStatus.textContent = "CSV download created from saved browser events.";
   });
 
   updateUserSelectors();
   updateDashboardStats();
+  if (dashboardCount) dashboardCount.textContent = dashboardEvents ? dashboardEvents + " saved event" + (dashboardEvents === 1 ? "" : "s") : "No saved events";
+  dashboardStateReady = true;
+  if (!dashboardWasRestored) persistDashboardState();
 
   /*
     TODO: Add real, post-testing values here only after research evaluation.

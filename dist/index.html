@@ -102,7 +102,7 @@
           <section class="dashboard-pane" id="dashboard-users" tabindex="-1" aria-labelledby="users-heading" hidden>
             <div class="management-layout">
               <article class="management-card profile-editor-card">
-                <div class="panel-heading"><div><p class="panel-kicker">Accounts</p><h3 id="users-heading">User management</h3></div><span class="muted-tag">Local sample data</span></div>
+                <div class="panel-heading"><div><p class="panel-kicker">Accounts</p><h3 id="users-heading">User management</h3></div><span class="muted-tag">Saved in this browser</span></div>
                 <div class="profile-summary" aria-label="Profile summary">
                   <div class="profile-photo" id="profile-photo-preview" aria-label="Selected profile photo"><span>SA</span></div>
                   <div>
@@ -110,12 +110,12 @@
                     <strong>BSCpE - 4B</strong>
                   </div>
                 </div>
-                <p class="form-note">Add or edit a Student or Employee, then assign an RFID Card No. This prototype does not save information after refresh.</p>
+                <p class="form-note">Add or edit a Student or Employee, then assign an RFID Card No. Your changes stay saved on this device after refresh.</p>
                 <form class="management-form" id="user-form">
                   <input id="managed-user-id" type="hidden">
                   <div class="photo-upload-control">
                     <div class="photo-upload-preview" id="photo-upload-preview" aria-label="Photo preview"><span>1×1</span></div>
-                    <div><label for="managed-photo">Profile photo</label><input id="managed-photo" type="file" accept="image/*"><p>Choose a 1×1 or 2×2 photo. It stays in this browser session only.</p></div>
+                    <div><label for="managed-photo">Profile photo</label><input id="managed-photo" type="file" accept="image/*"><p>Choose a 1×1 or 2×2 photo. It is saved only in this browser.</p></div>
                   </div>
                   <label for="managed-name">Full name</label><input id="managed-name" type="text" required placeholder="Sample Student B">
                   <label for="managed-role">Account type</label><select id="managed-role"><option>Student</option><option>Employee</option></select>
@@ -126,22 +126,22 @@
                 </form>
               </article>
               <article class="management-card table-card">
-                <div class="panel-heading"><div><p class="panel-kicker">Accounts list</p><h3>Students &amp; employees</h3></div><span id="user-count" class="muted-tag">1 sample user</span></div>
+                <div class="panel-heading"><div><p class="panel-kicker">Accounts list</p><h3>Students &amp; employees</h3></div><span id="user-count" class="muted-tag">1 saved user</span></div>
                 <div class="dashboard-table-wrap"><table><thead><tr><th>Photo</th><th>Name</th><th>Type</th><th>Course year</th><th>RFID Card No.</th><th>Actions</th></tr></thead><tbody id="user-table-body"><tr data-user-id="sample-user" data-user-name="Sample Student A" data-photo=""><td class="user-photo-cell"><span class="user-list-photo" aria-label="Sample Student A">SA</span></td><td>Sample Student A</td><td>Student</td><td>BSCpE - 4B</td><td>SAMPLE-RFID-001</td><td class="table-actions"><button type="button" class="table-action" data-user-action="edit">Edit</button><button type="button" class="table-action danger-action" data-user-action="delete">Delete</button></td></tr></tbody></table></div>
               </article>
             </div>
           </section>
           <section class="dashboard-pane" id="dashboard-access-logs" tabindex="-1" aria-labelledby="activity-heading" hidden>
             <div class="activity-panel">
-              <div class="panel-heading"><div><p class="panel-kicker">Entry history</p><h3 id="activity-heading">Access logs / history</h3></div><span id="dashboard-count">No sample events</span></div>
-              <div class="dashboard-table-wrap"><table><thead><tr><th>Time</th><th>Card holder</th><th>Door / room</th><th>Result</th><th>Monitor message</th></tr></thead><tbody id="dashboard-log"><tr class="dash-empty"><td colspan="5">No RFID event has been simulated. This dashboard is not connected to student records.</td></tr></tbody></table></div>
+              <div class="panel-heading"><div><p class="panel-kicker">Entry history</p><h3 id="activity-heading">Access logs / history</h3></div><span id="dashboard-count">No saved events</span></div>
+              <div class="dashboard-table-wrap"><table><thead><tr><th>Time</th><th>Card holder</th><th>Door / room</th><th>Result</th><th>Monitor message</th></tr></thead><tbody id="dashboard-log"><tr class="dash-empty"><td colspan="5">No RFID event has been recorded yet. New activity is saved in this browser.</td></tr></tbody></table></div>
             </div>
           </section>
           <section class="dashboard-pane" id="dashboard-rfid-cards" tabindex="-1" aria-labelledby="rfid-cards-heading" hidden>
             <div class="management-layout">
               <article class="management-card">
                 <div class="panel-heading"><div><p class="panel-kicker">Card control</p><h3 id="rfid-cards-heading">RFID card management</h3></div><span class="muted-tag">Card actions</span></div>
-                <p class="form-note">Register a new card and assign it to a local sample profile.</p>
+                <p class="form-note">Register a new card and assign it to a saved profile. Card changes stay on this device after refresh.</p>
                 <form class="management-form" id="card-form">
                   <label for="card-number">Card number</label><input id="card-number" type="text" required placeholder="RFID-0003">
                   <label for="card-user">Assigned user</label><select id="card-user"><option value="">Unassigned</option><option value="Sample Student A">Sample Student A</option></select>
@@ -150,14 +150,14 @@
                 </form>
               </article>
               <article class="management-card table-card">
-                <div class="panel-heading"><div><p class="panel-kicker">Card directory</p><h3>Registered cards</h3></div><span class="muted-tag">Temporary session</span></div>
+                <div class="panel-heading"><div><p class="panel-kicker">Card directory</p><h3>Registered cards</h3></div><span class="muted-tag">Saved on this device</span></div>
                 <div class="dashboard-table-wrap"><table><thead><tr><th>Card number</th><th>Assigned to</th><th>Status</th><th>Actions</th></tr></thead><tbody id="card-table-body"><tr><td>SAMPLE-RFID-001</td><td>Sample Student A</td><td><span class="access-status passed">Active</span></td><td class="table-actions"><button type="button" class="table-action danger-action" data-card-action="block">Block</button></td></tr></tbody></table></div>
               </article>
             </div>
           </section>
           <section class="dashboard-pane" id="dashboard-reports" tabindex="-1" aria-labelledby="reports-heading" hidden>
             <div class="report-panel">
-              <div class="panel-heading"><div><p class="panel-kicker">Research reporting</p><h3 id="reports-heading">Attendance &amp; access reports</h3></div><span class="muted-tag">Local preview</span></div>
+              <div class="panel-heading"><div><p class="panel-kicker">Research reporting</p><h3 id="reports-heading">Attendance &amp; access reports</h3></div><span class="muted-tag">Browser-saved data</span></div>
               <p class="form-note">Create a browser-only preview per day or per user. Use collected and approved records before producing research results.</p>
               <div class="report-controls"><label for="report-date">Date<input id="report-date" type="date"></label><label for="report-user">User<select id="report-user"><option value="All users">All users</option><option value="Sample Student A">Sample Student A</option></select></label><button class="form-primary" type="button" id="report-preview">Preview report</button><button class="form-secondary" type="button" id="report-print">Print</button><button class="form-secondary" type="button" id="report-download">Download CSV</button></div>
               <div class="report-placeholder" id="report-preview-area"><span aria-hidden="true">▦</span><div><strong>Report preview is ready when you are.</strong><p id="report-status" aria-live="polite">Choose a date or user, then select Preview report.</p></div></div>
