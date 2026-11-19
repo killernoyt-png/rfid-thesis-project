@@ -40,10 +40,11 @@
             <input id="portal-user" name="user" type="text" autocomplete="username" placeholder="Enter your user ID" required>
             <label for="portal-password">Password</label>
             <div class="password-field"><input id="portal-password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required><button type="button" class="password-toggle" aria-label="Show password">◌</button></div>
-            <div class="login-options"><label><input type="checkbox"> <span>Keep me signed in on this device</span></label><button class="link-button" type="button">Forgot password?</button></div>
+            <div class="login-options"><label><input id="keep-signed-in" type="checkbox"> <span>Keep me signed in on this device</span></label><button class="link-button" id="forgot-password" type="button">Forgot password?</button></div>
             <button class="portal-primary" type="submit">Sign in to dashboard <span aria-hidden="true">→</span></button>
           </form>
-          <p class="portal-note"><span aria-hidden="true">ⓘ</span> University gate monitoring portal for authorized campus personnel.</p>
+          <p class="login-status" id="login-status" aria-live="polite"></p>
+          <p class="portal-note"><span aria-hidden="true">ⓘ</span> Enter your campus account details to open the GateTap workspace. Dashboard records are stored in this browser.</p>
           <button class="public-site-link" type="button" data-open-public>View the thesis project website <span aria-hidden="true">↗</span></button>
         </div>
       </div>

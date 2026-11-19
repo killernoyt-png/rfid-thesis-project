@@ -532,6 +532,8 @@ body.app-active { background: #f4f7f5; }
 .login-card { width: min(100%, 480px); padding: clamp(1.25rem, 4vw, 2.5rem); border: 1px solid #dce6df; border-radius: .65rem; background: #fff; box-shadow: 0 8px 24px rgb(22 66 49 / .08); }
 .login-card h2 { font-size: clamp(2rem, 3vw, 2.7rem); }
 .portal-primary { border-radius: .38rem; box-shadow: none; }
+.login-status { min-height: 1.2rem; margin: .7rem 0 0; color: #267357; font-size: .82rem; font-weight: 600; }
+.login-status.is-error { color: #9b3847; }
 .portal-note { background: #f4f8f5; }
 
 .dashboard-view { grid-template-columns: 248px minmax(0, 1fr); background: #f4f7f5; background-image: none; }

@@ -156,6 +156,10 @@
   const loginView = document.getElementById("login-view");
   const dashboardView = document.getElementById("dashboard-view");
   const loginForm = document.getElementById("login-form");
+  const loginUser = document.getElementById("portal-user");
+  const loginPassword = document.getElementById("portal-password");
+  const keepSignedIn = document.getElementById("keep-signed-in");
+  const loginStatus = document.getElementById("login-status");
   const dashboardScan = document.getElementById("dashboard-scan");
   const dashboardDenied = document.getElementById("dashboard-denied");
   const dashboardTerminal = document.getElementById("dashboard-terminal");
@@ -177,6 +181,7 @@
   const dashboardRTC = document.getElementById("dashboard-rtc");
   const dashboardDate = document.getElementById("dashboard-date");
   const DASHBOARD_STORAGE_KEY = "gatetap-dashboard-state-v1";
+  const GATETAP_SESSION_KEY = "gatetap-keep-signed-in-v1";
   let dashboardEvents = 0;
   let deniedEvents = 0;
   let selectedProfilePhoto = "";
@@ -204,6 +209,29 @@
       return state && typeof state === "object" ? state : null;
     } catch (error) {
       return null;
+    }
+  }
+
+  function setLoginStatus(message, isError) {
+    if (!loginStatus) return;
+    loginStatus.textContent = message || "";
+    loginStatus.classList.toggle("is-error", Boolean(isError));
+  }
+
+  function saveSessionPreference(shouldKeepSession) {
+    try {
+      if (shouldKeepSession) window.localStorage.setItem(GATETAP_SESSION_KEY, "1");
+      else window.localStorage.removeItem(GATETAP_SESSION_KEY);
+    } catch (error) {
+      // The dashboard remains usable when browser storage is unavailable.
+    }
+  }
+
+  function hasSavedSession() {
+    try {
+      return window.localStorage.getItem(GATETAP_SESSION_KEY) === "1";
+    } catch (error) {
+      return false;
     }
   }
 
@@ -273,6 +301,7 @@
     loginView.hidden = false;
     document.body.classList.add("app-active");
     loginForm.reset();
+    setLoginStatus("");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -285,15 +314,36 @@
 
   loginForm?.addEventListener("submit", (event) => {
     event.preventDefault();
+    const userId = loginUser?.value.trim() || "";
+    const password = loginPassword?.value || "";
+    if (!userId || !password) {
+      setLoginStatus("Enter both your user ID and password to continue.", true);
+      const missingField = !userId ? loginUser : loginPassword;
+      missingField?.focus();
+      return;
+    }
+    saveSessionPreference(Boolean(keepSignedIn?.checked));
+    setLoginStatus("");
     showDashboard();
+  });
+
+  document.getElementById("forgot-password")?.addEventListener("click", () => {
+    setLoginStatus("For password assistance, please contact the GateTap administrator.");
   });
 
   document.querySelectorAll("[data-open-public]").forEach((button) => {
     button.addEventListener("click", showPublicSite);
   });
 
-  document.querySelectorAll("[data-open-portal], [data-signout]").forEach((button) => {
+  document.querySelectorAll("[data-open-portal]").forEach((button) => {
     button.addEventListener("click", showLogin);
+  });
+
+  document.querySelectorAll("[data-signout]").forEach((button) => {
+    button.addEventListener("click", () => {
+      saveSessionPreference(false);
+      showLogin();
+    });
   });
 
   document.querySelector(".password-toggle")?.addEventListener("click", (event) => {
@@ -783,6 +833,7 @@
   if (dashboardCount) dashboardCount.textContent = dashboardEvents ? dashboardEvents + " saved event" + (dashboardEvents === 1 ? "" : "s") : "No saved events";
   dashboardStateReady = true;
   if (!dashboardWasRestored) persistDashboardState();
+  if (hasSavedSession()) showDashboard();
 
   /*
     TODO: Add real, post-testing values here only after research evaluation.
