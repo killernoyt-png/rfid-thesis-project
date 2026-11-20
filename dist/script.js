@@ -161,6 +161,7 @@
   const keepSignedIn = document.getElementById("keep-signed-in");
   const loginStatus = document.getElementById("login-status");
   const dashboardScan = document.getElementById("dashboard-scan");
+  const dashboardOut = document.getElementById("dashboard-out");
   const dashboardDenied = document.getElementById("dashboard-denied");
   const dashboardTerminal = document.getElementById("dashboard-terminal");
   const dashboardLog = document.getElementById("dashboard-log");
@@ -177,7 +178,6 @@
   const cardForm = document.getElementById("card-form");
   const cardTable = document.getElementById("card-table-body");
   const settingsForm = document.getElementById("settings-form");
-  const doorList = document.getElementById("door-list");
   const dashboardRTC = document.getElementById("dashboard-rtc");
   const dashboardDate = document.getElementById("dashboard-date");
   const DASHBOARD_STORAGE_KEY = "gatetap-dashboard-state-v1";
@@ -188,6 +188,7 @@
   let activeDashboardPane = "dashboard-overview";
   let lastTerminalState = null;
   let dashboardStateReady = false;
+  let defaultAccountType = "Student";
 
   function updateDashboardRTC() {
     const now = new Date();
@@ -256,17 +257,13 @@
         blocked: cellText(row, 2) === "Blocked"
       })),
       logs: Array.from(dashboardLog?.querySelectorAll("tr:not(.dash-empty)") || []).map((row) => ({
-        time: cellText(row, 0),
-        holder: cellText(row, 1),
-        door: cellText(row, 2),
+        timeIn: cellText(row, 0),
+        timeOut: cellText(row, 1),
+        holder: cellText(row, 2),
         result: cellText(row, 3),
         message: cellText(row, 4)
       })),
-      doors: Array.from(doorList?.querySelectorAll("li") || []).map((item) => ({
-        name: item.querySelector("strong")?.textContent.trim() || "",
-        description: item.querySelector("small")?.textContent.trim() || "",
-        level: item.querySelector("b")?.textContent.trim() || ""
-      })).filter((door) => door.name),
+      defaultAccountType,
       dashboardEvents,
       deniedEvents,
       activePane: activeDashboardPane,
@@ -290,6 +287,8 @@
     dashboardView.hidden = false;
     document.body.classList.add("app-active");
     dashboardView.classList.remove("sidebar-open");
+    if (!dashboardNarrow.matches) dashboardView.classList.add("sidebar-collapsed");
+    else dashboardView.classList.remove("sidebar-collapsed");
     document.querySelector(".dashboard-menu")?.setAttribute("aria-expanded", String(!dashboardNarrow.matches));
     selectDashboardPane(activeDashboardPane, false);
     updateDashboardStats();
@@ -302,13 +301,6 @@
     document.body.classList.add("app-active");
     loginForm.reset();
     setLoginStatus("");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function showPublicSite() {
-    document.body.classList.remove("app-active");
-    dashboardView.hidden = true;
-    loginView.hidden = false;
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -329,10 +321,6 @@
 
   document.getElementById("forgot-password")?.addEventListener("click", () => {
     setLoginStatus("For password assistance, please contact the GateTap administrator.");
-  });
-
-  document.querySelectorAll("[data-open-public]").forEach((button) => {
-    button.addEventListener("click", showPublicSite);
   });
 
   document.querySelectorAll("[data-open-portal]").forEach((button) => {
@@ -403,6 +391,7 @@
       window.setTimeout(() => target.classList.add("is-highlighted"), 120);
       window.setTimeout(() => target.classList.remove("is-highlighted"), 1400);
     }
+    if (paneId === "dashboard-rfid-cards") setNextCardNumber();
     persistDashboardState();
   }
 
@@ -508,11 +497,11 @@
     return row;
   }
 
-  function createAccessLogRow({ time, holder, door, result, message }) {
+  function createAccessLogRow({ timeIn, timeOut, holder, door, result, message }) {
     const row = document.createElement("tr");
-    createCell(row, time);
+    createCell(row, timeIn || "");
+    createCell(row, timeOut || "");
     createCell(row, holder);
-    createCell(row, door);
     const stateCell = document.createElement("td");
     const state = document.createElement("span");
     state.className = "access-status " + (result === "PASSED" ? "passed" : "denied");
@@ -523,36 +512,47 @@
     return row;
   }
 
-  function addAccessLog({ holder, door, result, message }) {
+  function addAccessLog({ holder, door, result, message, eventType = "in" }) {
     const now = new Date();
     const emptyDashboard = dashboardLog?.querySelector(".dash-empty");
     if (emptyDashboard) emptyDashboard.remove();
-    const row = createAccessLogRow({ time: formatTime(now), holder, door, result, message });
+    const time = formatTime(now);
+    const row = createAccessLogRow({
+      timeIn: eventType === "in" ? time : "",
+      timeOut: eventType === "out" ? time : "",
+      holder,
+      door,
+      result,
+      message
+    });
     dashboardLog?.prepend(row);
     dashboardEvents += 1;
     if (result === "DENIED") deniedEvents += 1;
     if (dashboardCount) dashboardCount.textContent = dashboardEvents + " saved event" + (dashboardEvents === 1 ? "" : "s");
     updateDashboardStats();
-    return formatTime(now);
+    return time;
   }
 
   function showTerminal(status, detail, denied) {
     if (!dashboardTerminal) return;
     lastTerminalState = { status, detail, denied: Boolean(denied) };
     dashboardTerminal.replaceChildren();
-    const symbol = document.createElement("span");
-    symbol.className = "terminal-wave";
-    symbol.textContent = denied ? "!" : "✓";
     const heading = document.createElement("strong");
     heading.textContent = status;
     const copy = document.createElement("p");
     copy.textContent = detail;
-    dashboardTerminal.append(symbol, heading, copy);
+    dashboardTerminal.append(heading, copy);
   }
 
   dashboardScan?.addEventListener("click", () => {
-    const time = addAccessLog({ holder: "Sample Student A", door: "Isulan Main Gate", result: "PASSED", message: "Entry recorded · sample transaction" });
+    const time = addAccessLog({ holder: "Sample Student A", door: "Isulan Main Gate", result: "PASSED", message: "Entry recorded · sample transaction", eventType: "in" });
     showTerminal("ENTRY RECORDED", "Sample Student A · " + time, false);
+    persistDashboardState();
+  });
+
+  dashboardOut?.addEventListener("click", () => {
+    const time = addAccessLog({ holder: "Sample Student A", door: "Isulan Main Gate", result: "PASSED", message: "Exit recorded · sample transaction", eventType: "out" });
+    showTerminal("TIME OUT RECORDED", "Sample Student A · " + time, false);
     persistDashboardState();
   });
 
@@ -698,18 +698,15 @@
     return row;
   }
 
-  function createDoorItem(name, level, description) {
-    const item = document.createElement("li");
-    const label = document.createElement("span");
-    const heading = document.createElement("strong");
-    const copy = document.createElement("small");
-    const badge = document.createElement("b");
-    heading.textContent = name;
-    copy.textContent = description || "Saved access point";
-    badge.textContent = level;
-    label.append(heading, copy);
-    item.append(label, badge);
-    return item;
+  function setNextCardNumber() {
+    const input = document.getElementById("card-number");
+    if (!input) return;
+    let highest = 0;
+    cardTable?.querySelectorAll("tr").forEach((row) => {
+      const match = row.cells[0]?.textContent.match(/(\d+)$/);
+      if (match) highest = Math.max(highest, Number(match[1]));
+    });
+    input.value = "RFID-" + String(highest + 1).padStart(4, "0");
   }
 
   cardForm?.addEventListener("submit", (event) => {
@@ -719,6 +716,7 @@
     if (!number) return;
     cardTable?.append(createCardRow(number, assigned, false));
     cardForm.reset();
+    setNextCardNumber();
     const notice = document.getElementById("card-form-status");
     notice.textContent = "Card registered and saved in this browser.";
     if (!persistDashboardState()) notice.textContent = "Card registered, but this browser could not save it.";
@@ -740,14 +738,11 @@
 
   settingsForm?.addEventListener("submit", (event) => {
     event.preventDefault();
-    const name = document.getElementById("door-name").value.trim();
-    const level = document.getElementById("access-level").value;
-    if (!name) return;
-    doorList?.append(createDoorItem(name, level, "Saved access point"));
-    settingsForm.reset();
+    defaultAccountType = document.getElementById("default-account-type")?.value === "Visitor" ? "Visitor" : "Student";
+    document.getElementById("managed-role").value = defaultAccountType;
     const notice = document.getElementById("settings-form-status");
-    notice.textContent = "Door or room added and saved in this browser.";
-    if (!persistDashboardState()) notice.textContent = "Door added, but this browser could not save it.";
+    notice.textContent = "Settings saved.";
+    if (!persistDashboardState()) notice.textContent = "Settings updated, but this browser could not save them.";
   });
 
   const reportDate = document.getElementById("report-date");
@@ -761,7 +756,7 @@
       state.users.filter((user) => user && user.name).forEach((user, index) => {
         userTable.append(createUserRow(
           user.name,
-          user.role || "Student",
+          (user.role === "Visitor" ? "Visitor" : "Student"),
           user.courseYear || "BSCpE - 4B",
           user.rfid || "",
           user.id || "saved-user-" + index,
@@ -777,8 +772,9 @@
     }
     if (Array.isArray(state.logs) && dashboardLog) {
       dashboardLog.replaceChildren();
-      state.logs.filter((log) => log && log.time).forEach((log) => dashboardLog.append(createAccessLogRow({
-        time: log.time,
+      state.logs.filter((log) => log && (log.timeIn || log.timeOut || log.time)).forEach((log) => dashboardLog.append(createAccessLogRow({
+        timeIn: log.timeIn || (log.time && log.message?.toLowerCase().includes("exit") ? "" : log.time),
+        timeOut: log.timeOut || (log.time && log.message?.toLowerCase().includes("exit") ? log.time : ""),
         holder: log.holder || "Unknown card",
         door: log.door || "Isulan Main Gate",
         result: log.result === "PASSED" ? "PASSED" : "DENIED",
@@ -786,16 +782,17 @@
       })));
       if (!dashboardLog.children.length) dashboardLog.append(createEmptyDashboardLog());
     }
-    if (Array.isArray(state.doors) && doorList) {
-      doorList.replaceChildren();
-      state.doors.forEach((door) => {
-        if (door?.name) doorList.append(createDoorItem(door.name, door.level || "Student", door.description));
-      });
-    }
     dashboardEvents = Number.isFinite(state.dashboardEvents) ? Math.max(0, state.dashboardEvents) : (state.logs?.length || 0);
     deniedEvents = Number.isFinite(state.deniedEvents) ? Math.max(0, state.deniedEvents) : (state.logs || []).filter((log) => log?.result === "DENIED").length;
+    defaultAccountType = state.defaultAccountType === "Visitor" ? "Visitor" : "Student";
+    if (document.getElementById("default-account-type")) document.getElementById("default-account-type").value = defaultAccountType;
     activeDashboardPane = document.getElementById(state.activePane) ? state.activePane : "dashboard-overview";
-    dashboardView.classList.toggle("sidebar-collapsed", Boolean(state.sidebarCollapsed));
+    if (dashboardNarrow.matches) {
+      dashboardView.classList.remove("sidebar-collapsed");
+      dashboardView.classList.remove("sidebar-open");
+    } else {
+      dashboardView.classList.add("sidebar-collapsed");
+    }
     if (state.terminal?.status && state.terminal?.detail) {
       showTerminal(state.terminal.status, state.terminal.detail, state.terminal.denied);
     }
@@ -817,7 +814,7 @@
   reportUser?.addEventListener("change", persistDashboardState);
   document.getElementById("report-print")?.addEventListener("click", () => window.print());
   document.getElementById("report-download")?.addEventListener("click", () => {
-    const lines = [["Time", "Card holder", "Door / room", "Result", "Monitor message"]];
+    const lines = [["Time In", "Time Out", "Card holder", "Result", "Monitor message"]];
     dashboardLog?.querySelectorAll("tr:not(.dash-empty)").forEach((row) => lines.push(Array.from(row.cells).map((cell) => cell.textContent.trim())));
     const csv = lines.map((line) => line.map((value) => '"' + value.replaceAll('"', '""') + '"').join(",")).join("\n");
     const link = document.createElement("a");
@@ -830,6 +827,7 @@
 
   updateUserSelectors();
   updateDashboardStats();
+  setNextCardNumber();
   if (dashboardCount) dashboardCount.textContent = dashboardEvents ? dashboardEvents + " saved event" + (dashboardEvents === 1 ? "" : "s") : "No saved events";
   dashboardStateReady = true;
   if (!dashboardWasRestored) persistDashboardState();
