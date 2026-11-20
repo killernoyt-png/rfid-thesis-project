@@ -628,6 +628,12 @@ body.app-active { background: #f4f7f5; }
   .reader-status-card { margin-top: 1rem; }
 }
 
+/* Restore the single-column dashboard layout on tablets and phones. */
+@media (max-width: 880px) {
+  .dashboard-view { grid-template-columns: minmax(0, 1fr); }
+  .dashboard-main { grid-column: 1; width: 100%; }
+}
+
 body.app-active .dashboard-nav button.active,
 body.app-active .dashboard-nav button[aria-current="page"] {
   border-color: #b9dccb;
@@ -646,3 +652,31 @@ body.app-active .dashboard-nav button[aria-current="page"] .nav-icon {
   background: #167653;
   box-shadow: none;
 }
+
+/* Keep the thesis pages as restrained as the university dashboard. */
+body:not(.app-active) .hero { min-height: auto; background: #0e4a38; }
+body:not(.app-active) .hero-grid { min-height: auto; grid-template-columns: minmax(0, 1fr); max-width: 960px; padding-top: 5rem; padding-bottom: 5rem; }
+body:not(.app-active) .hero-rays,
+body:not(.app-active) .hero-visual,
+body:not(.app-active) .hero-bottom { display: none; }
+body:not(.app-active) .hero-title { max-width: 680px; font-size: 1.05rem; line-height: 1.7; }
+body:not(.app-active) .hero-meta { max-width: 620px; margin-top: 2.5rem; }
+body:not(.app-active) .section { padding: clamp(3.75rem, 7vw, 5.5rem) 0; }
+body:not(.app-active) .section-heading { margin-bottom: clamp(1.75rem, 4vw, 2.75rem); }
+body:not(.app-active) .issue-card,
+body:not(.app-active) .step-card,
+body:not(.app-active) .feature-grid article,
+body:not(.app-active) .person-card,
+body:not(.app-active) .architecture-card { border-radius: .5rem; box-shadow: none; }
+body:not(.app-active) .issue-card:hover,
+body:not(.app-active) .diagram-node:hover,
+body:not(.app-active) .diagram-node.active { transform: none; }
+body:not(.app-active) .step-card::after { display: none; }
+body:not(.app-active) .demo-section { background: #0e4a38; }
+body:not(.app-active) .demo-controls,
+body:not(.app-active) .log-wrap { border-radius: .5rem; background: rgb(0 0 0 / .08); }
+body:not(.app-active) .demo-button:hover { transform: none; }
+body:not(.app-active) .reveal,
+body:not(.app-active) .tap-card,
+body:not(.app-active) .signal,
+body:not(.app-active) .screen-symbol { animation: none; }
